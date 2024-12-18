@@ -9,8 +9,18 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        'sage': {
+          50: '#f6f7f6',
+          100: '#e3e7e3',
+          200: '#c8d1c8',
+          300: '#a7b5a7',
+          400: '#869886',
+          500: '#6b7d6b',
+          600: '#556455',
+          700: '#455145',
+          800: '#3a433a',
+          900: '#333833',
+        },
       },
     },
   },
