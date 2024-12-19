@@ -18,20 +18,16 @@ datasource db {
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
-  username      String?
-  password      String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
-  // Relations
-  habits        Habit[]
-  habitLogs     HabitLog[]
-  
-  // Auth.js fields
+  username      String
+  password      String     // assurez-vous que ce champ existe
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
+  habits        Habit[]
+  habitLogs     HabitLog[]
 }
 
 model Habit {

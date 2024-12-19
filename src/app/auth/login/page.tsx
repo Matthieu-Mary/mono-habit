@@ -1,13 +1,36 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function Login() {
   const router = useRouter();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implémenter la logique de connexion
-    console.log("Connexion en cours...");
+
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (res.ok) {
+      console.log("Connexion réussie");
+      router.push("/dashboard");
+    } else {
+      const data = await res.json();
+      console.error("Erreur lors de la connexion", data.error);
+    }
   };
 
   return (
@@ -19,24 +42,34 @@ export default function Login() {
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-sage-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-sage-700"
+            >
               Email
             </label>
             <input
               type="email"
               id="email"
+              value={formData.email}
+              onChange={handleChange}
               className="mt-1 block w-full rounded-md border border-sage-300 px-3 py-2 text-sage-800 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               required
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-sage-700">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-sage-700"
+            >
               Mot de passe
             </label>
             <input
               type="password"
               id="password"
+              value={formData.password}
+              onChange={handleChange}
               className="mt-1 block w-full rounded-md border border-sage-300 px-3 py-2 text-sage-800 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               required
             />
