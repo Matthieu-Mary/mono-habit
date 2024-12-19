@@ -9,24 +9,36 @@ export default function Register() {
     email: "",
     password: "",
   });
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    if (res.ok) {
-      console.log("Inscription réussie");
-      router.push("/auth/login");
-    } else {
       const data = await res.json();
-      console.error("Erreur lors de l'inscription", data.error);
+
+      if (res.ok) {
+        router.push("/auth/login");
+        router.refresh();
+      } else {
+        setError(data.error || "Une erreur est survenue lors de l'inscription");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Erreur de connexion au serveur");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -38,6 +50,12 @@ export default function Register() {
         </h1>
 
         <form onSubmit={handleRegister} className="space-y-6">
+          {error && (
+            <div className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-md p-3">
+              {error}
+            </div>
+          )}
+
           <div>
             <label
               htmlFor="username"
@@ -97,9 +115,35 @@ export default function Register() {
 
           <button
             type="submit"
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-8 rounded-full transition-all transform hover:scale-105"
+            disabled={isLoading}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-8 rounded-full transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Créer un compte
+            {isLoading ? (
+              <span className="inline-flex items-center justify-center w-full">
+                <svg
+                  className="animate-spin h-6 w-6 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              </span>
+            ) : (
+              "Créer un compte"
+            )}
           </button>
         </form>
 
