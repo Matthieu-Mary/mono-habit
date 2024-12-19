@@ -19,8 +19,11 @@ export default function Register() {
 
         <form onSubmit={handleRegister} className="space-y-6">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-sage-700">
-              Nom d'utilisateur
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-sage-700"
+            >
+              Nom d&apos;utilisateur
             </label>
             <input
               type="text"
@@ -31,7 +34,10 @@ export default function Register() {
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-sage-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-sage-700"
+            >
               Email
             </label>
             <input
@@ -43,7 +49,10 @@ export default function Register() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-sage-700">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-sage-700"
+            >
               Mot de passe
             </label>
             <input
@@ -74,4 +83,4 @@ export default function Register() {
       </div>
     </main>
   );
-} 
+}
