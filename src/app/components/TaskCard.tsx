@@ -15,6 +15,8 @@ export default function TaskCard({
   readonly task: Task;
   readonly isCompleted: boolean;
 }) {
+ 
+
   const handleComplete = async () => {
     if (!task.id) return;
 
@@ -49,7 +51,7 @@ export default function TaskCard({
           </div>
 
           {task.description && (
-            <p className="text-sage-600 text-sm line-clamp-2">
+            <p className="text-sage-600 text-sm line-clamp-2 mb-2 mt-4">
               {task.description}
             </p>
           )}

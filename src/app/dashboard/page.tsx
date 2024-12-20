@@ -6,18 +6,59 @@ import { motion } from "framer-motion";
 import TaskModal from "../components/TaskModal";
 import TaskCard from "../components/TaskCard";
 
+function calculateTimeRemaining(): string {
+  const now = new Date();
+  const endOfDay = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    23,
+    59,
+    59
+  );
+
+  const diffInMilliseconds = endOfDay.getTime() - now.getTime();
+  const diffInMinutes = Math.floor(diffInMilliseconds / (1000 * 60));
+
+  const hours = Math.floor(diffInMinutes / 60);
+  const minutes = diffInMinutes % 60;
+
+  if (hours === 0) {
+    return `Il vous reste ${minutes} minutes pour terminer la tâche du jour`;
+  } else if (minutes === 0) {
+    return `Il vous reste ${hours} heures pour terminer la tâche du jour`;
+  } else {
+    return `Il vous reste ${hours} heures et ${minutes} minutes pour terminer la tâche du jour`;
+  }
+}
+
 export default function DashboardPage() {
   const { session, status } = useAuth();
   const [timeProgress, setTimeProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState("");
   const [isCompleted, setIsCompleted] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showTimeTooltip, setShowTimeTooltip] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [currentTask, setCurrentTask] = useState<{
     id: string;
     title: string;
     description?: string;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [timeRemaining, setTimeRemaining] = useState<string>("");
+
+  useEffect(() => {
+    // Mettre à jour le temps restant immédiatement
+    setTimeRemaining(calculateTimeRemaining());
+
+    // Mettre à jour toutes les minutes
+    const interval = setInterval(() => {
+      setTimeRemaining(calculateTimeRemaining());
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const fetchTodayTask = useCallback(async () => {
     try {
@@ -77,6 +118,13 @@ export default function DashboardPage() {
     );
   }
 
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    setMousePosition({ x, y });
+  };
+
   return (
     <div className="min-h-screen bg-sage-50 p-8">
       {/* En-tête */}
@@ -98,25 +146,48 @@ export default function DashboardPage() {
                 month: "long",
               })}
             </p>
-            {/* <div className="text-3xl font-mono text-sage-700">
-              {currentTime}
-            </div> */}
           </div>
         </motion.div>
       </header>
 
       {/* Barre de progression de la journée */}
+      <div className="relative">
+        <div className="relative">
+          <motion.div
+            initial={{ opacity: 0, scaleX: 0 }}
+            animate={{ opacity: 1, scaleX: 1 }}
+            className="mb-6 bg-sage-200 rounded-full h-4 overflow-hidden cursor-pointer"
+            onMouseEnter={() => setShowTimeTooltip(true)}
+            onMouseLeave={() => setShowTimeTooltip(false)}
+            onMouseMove={handleMouseMove}
+          >
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${timeProgress}%` }}
+              transition={{ duration: 1 }}
+              className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full"
+            />
+            {showTimeTooltip && (
+              <div
+                className="fixed bg-white px-4 py-2 rounded-lg shadow-lg text-sage-700 font-mono z-10 pointer-events-none"
+                style={{
+                  left: `${mousePosition.x}px`,
+                  top: `${mousePosition.y}px + 300px`,
+                }}
+              >
+                {currentTime}
+              </div>
+            )}
+          </motion.div>
+        </div>
+      </div>
+
       <motion.div
-        initial={{ opacity: 0, scaleX: 0 }}
-        animate={{ opacity: 1, scaleX: 1 }}
-        className="mb-10 bg-sage-200 rounded-full h-4 overflow-hidden"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-2xl p-4 shadow-lg mb-8 text-center lg:text-left"
       >
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${timeProgress}%` }}
-          transition={{ duration: 1 }}
-          className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full"
-        />
+        <p className="text-sm font-mono text-sage-700 lg:text-lg " >{timeRemaining}</p>
       </motion.div>
 
       {/* Contenu principal */}
