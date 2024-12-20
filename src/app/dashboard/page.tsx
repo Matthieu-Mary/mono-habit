@@ -3,11 +3,15 @@
 import { useAuth } from "../hooks/useAuth";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import TaskModal from "../components/TaskModal";
+import TaskCard from "../components/TaskCard";
 
 export default function DashboardPage() {
   const { session, status } = useAuth();
   const [timeProgress, setTimeProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentTask, setCurrentTask] = useState<{ title: string; description?: string } | null>(null);
 
   // Calculer la progression de la journée
   useEffect(() => {
@@ -31,6 +35,11 @@ export default function DashboardPage() {
     const interval = setInterval(updateProgress, 60000); // Mise à jour chaque minute
     return () => clearInterval(interval);
   }, []);
+
+  const handleAddTask = (task: { title: string; description?: string }) => {
+    setCurrentTask(task);
+    setIsModalOpen(false);
+  };
 
   if (status === "loading") {
     return (
@@ -90,12 +99,21 @@ export default function DashboardPage() {
           <h2 className="text-2xl font-semibold text-sage-800 mb-6">
             Tâche du jour
           </h2>
-          {/* Placeholder pour la tâche du jour */}
-          <div className="flex items-center justify-center h-40 border-2 border-dashed border-sage-300 rounded-xl">
-            <button className="px-6 py-3 bg-emerald-500 text-white rounded-full hover:bg-emerald-600 transition-colors">
-              + Ajouter une tâche
-            </button>
-          </div>
+          
+          {currentTask ? (
+            <TaskCard task={currentTask} />
+          ) : (
+            <div className="flex items-center justify-center h-40 border-2 border-dashed border-sage-300 rounded-xl">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-6 py-3 bg-emerald-500 text-white rounded-full hover:bg-emerald-600 transition-colors"
+                onClick={() => setIsModalOpen(true)}
+              >
+                + Ajouter une tâche
+              </motion.button>
+            </div>
+          )}
         </motion.div>
 
         {/* Actions rapides */}
@@ -119,6 +137,12 @@ export default function DashboardPage() {
           </div>
         </motion.div>
       </div>
+
+      <TaskModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleAddTask}
+      />
     </div>
   );
 }
