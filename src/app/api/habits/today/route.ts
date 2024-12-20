@@ -11,12 +11,16 @@ export async function GET() {
     }
 
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
 
     const habitLog = await prisma.habitLog.findFirst({
       where: {
         userId: session.user.id,
-        date: today,
+        date: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
       },
       include: {
         habit: true,

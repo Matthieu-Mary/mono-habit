@@ -54,19 +54,6 @@ export default function TaskCard({ task }: { task: Task }) {
           </p>
         )}
       </div>
-
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={handleComplete}
-        className={`absolute right-4 top-4 p-2 rounded-full ${
-          isCompleted
-            ? "bg-emerald-500 text-white"
-            : "bg-sage-100 text-sage-600 hover:bg-sage-200"
-        }`}
-      >
-        {isCompleted ? "✓" : "○"}
-      </motion.button>
     </motion.div>
   );
 }
