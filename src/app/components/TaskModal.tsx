@@ -6,11 +6,16 @@ import { useState } from "react";
 interface TaskModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (task: { title: string; description?: string }) => void;
+  onSuccess: () => void;
 }
 
-export default function TaskModal({ isOpen, onClose, onSubmit }: TaskModalProps) {
+export default function TaskModal({
+  isOpen,
+  onClose,
+  onSuccess,
+}: TaskModalProps) {
   const [formData, setFormData] = useState({ title: "", description: "" });
+  const [isLoading, setIsLoading] = useState(false);
 
   // Animation des particules en arrière-plan
   const particles = Array.from({ length: 20 }).map((_, i) => (
@@ -33,6 +38,29 @@ export default function TaskModal({ isOpen, onClose, onSubmit }: TaskModalProps)
       }}
     />
   ));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/habits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) throw new Error("Erreur lors de la création");
+
+      setFormData({ title: "", description: "" });
+      onSuccess();
+      onClose();
+    } catch (error) {
+      console.error("Erreur:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -58,19 +86,12 @@ export default function TaskModal({ isOpen, onClose, onSubmit }: TaskModalProps)
             onClick={(e) => e.stopPropagation()}
           >
             <div className="absolute -top-2 -left-2 w-full h-full bg-emerald-100 rounded-3xl -z-10 transform rotate-1"></div>
-            
+
             <h2 className="text-2xl font-bold text-sage-800 mb-6">
               Nouvelle tâche
             </h2>
 
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                onSubmit(formData);
-                setFormData({ title: "", description: "" });
-              }}
-              className="space-y-6"
-            >
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sage-700 mb-2" htmlFor="title">
                   Titre
@@ -89,7 +110,10 @@ export default function TaskModal({ isOpen, onClose, onSubmit }: TaskModalProps)
               </div>
 
               <div>
-                <label className="block text-sage-700 mb-2" htmlFor="description">
+                <label
+                  className="block text-sage-700 mb-2"
+                  htmlFor="description"
+                >
                   Description (optionnelle)
                 </label>
                 <motion.textarea
@@ -128,4 +152,4 @@ export default function TaskModal({ isOpen, onClose, onSubmit }: TaskModalProps)
       )}
     </AnimatePresence>
   );
-} 
+}

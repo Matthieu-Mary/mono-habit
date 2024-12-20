@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "../hooks/useAuth";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import TaskModal from "../components/TaskModal";
 import TaskCard from "../components/TaskCard";
@@ -11,7 +11,38 @@ export default function DashboardPage() {
   const [timeProgress, setTimeProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentTask, setCurrentTask] = useState<{ title: string; description?: string } | null>(null);
+  const [currentTask, setCurrentTask] = useState<{
+    id: string;
+    title: string;
+    description?: string;
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchTodayTask = useCallback(async () => {
+    try {
+      const response = await fetch("/api/habits/today");
+      if (!response.ok) throw new Error("Erreur lors du chargement");
+
+      const data = await response.json();
+      setCurrentTask(
+        data.habit
+          ? {
+              id: data.habit.id,
+              title: data.habit.name,
+              description: data.habit.description,
+            }
+          : null
+      );
+    } catch (error) {
+      console.error("Erreur:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTodayTask();
+  }, [fetchTodayTask]);
 
   // Calculer la progression de la journée
   useEffect(() => {
@@ -35,11 +66,6 @@ export default function DashboardPage() {
     const interval = setInterval(updateProgress, 60000); // Mise à jour chaque minute
     return () => clearInterval(interval);
   }, []);
-
-  const handleAddTask = (task: { title: string; description?: string }) => {
-    setCurrentTask(task);
-    setIsModalOpen(false);
-  };
 
   if (status === "loading") {
     return (
@@ -99,7 +125,7 @@ export default function DashboardPage() {
           <h2 className="text-2xl font-semibold text-sage-800 mb-6">
             Tâche du jour
           </h2>
-          
+
           {currentTask ? (
             <TaskCard task={currentTask} />
           ) : (
@@ -141,7 +167,7 @@ export default function DashboardPage() {
       <TaskModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={handleAddTask}
+        onSuccess={fetchTodayTask}
       />
     </div>
   );
