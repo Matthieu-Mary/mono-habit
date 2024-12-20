@@ -30,6 +30,7 @@ model User {
   habitLogs     HabitLog[]
 }
 
+// Sert à enregistrer les habitudes (ex: manger une pomme, lire un livre, etc.)
 model Habit {
   id          String    @id @default(cuid())
   name        String
@@ -49,6 +50,7 @@ model Habit {
   @@index([userId])
 }
 
+// Sert à enregistrer les logs des habitudes (ex: si on a mangé une pomme aujourd'hui, on enregistre le log)
 model HabitLog {
   id          String    @id @default(cuid())
   date        DateTime
@@ -97,6 +99,7 @@ model Account {
   @@index([userId])
 }
 
+// Sert à enregistrer les sessions (ex: si on se connecte, on enregistre la session)
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
@@ -107,6 +110,7 @@ model Session {
   @@index([userId])
 }
 
+// Sert à enregistrer les tokens de vérification (ex: si on a oublié notre mot de passe, on enregistre le token)
 model VerificationToken {
   identifier String
   token      String   @unique

@@ -10,6 +10,7 @@ export default function DashboardPage() {
   const { session, status } = useAuth();
   const [timeProgress, setTimeProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState("");
+  const [isCompleted, setIsCompleted] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState<{
     id: string;
@@ -33,6 +34,7 @@ export default function DashboardPage() {
             }
           : null
       );
+      setIsCompleted(data.completed);
     } catch (error) {
       console.error("Erreur:", error);
     } finally {
@@ -130,7 +132,7 @@ export default function DashboardPage() {
           </h2>
 
           {currentTask ? (
-            <TaskCard task={currentTask} />
+            <TaskCard task={currentTask} isCompleted={isCompleted} />
           ) : (
             <div className="flex items-center justify-center h-40 border-2 border-dashed border-sage-300 rounded-xl">
               <motion.button

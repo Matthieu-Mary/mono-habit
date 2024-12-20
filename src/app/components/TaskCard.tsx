@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
 
 interface Task {
   id?: string;
@@ -9,20 +8,20 @@ interface Task {
   description?: string;
 }
 
-export default function TaskCard({ task }: { task: Task }) {
-  const [isCompleted, setIsCompleted] = useState(false);
-
+export default function TaskCard({
+  task,
+  isCompleted,
+}: {
+  readonly task: Task;
+  readonly isCompleted: boolean;
+}) {
   const handleComplete = async () => {
     if (!task.id) return;
 
     try {
-      const response = await fetch(`/api/habits/${task.id}/complete`, {
+      await fetch(`/api/habits/${task.id}/complete`, {
         method: "POST",
       });
-
-      if (response.ok) {
-        setIsCompleted(true);
-      }
     } catch (error) {
       console.error("Erreur lors de la complétion de la tâche:", error);
     }
