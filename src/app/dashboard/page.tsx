@@ -78,25 +78,28 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-sage-50 p-8">
       {/* En-tête */}
-      <header className="mb-12">
+      <header className="mb-4 ml-16 lg:mb-6">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex justify-between items-center"
         >
-          <div>
+          <div className="flex flex-col items-center w-full lg:flex-row lg:justify-between lg:items-center">
             <h1 className="text-4xl font-bold text-sage-800">
-              Bonjour, {session?.user?.name}
+              Bonjour{" "}
+              <span className="text-emerald-600">{session?.user?.name}</span>
             </h1>
-            <p className="text-sage-600 mt-2">
+            <p className="text-3xl font-mono text-sage-700 mt-2 lg:mt-0">
               {new Date().toLocaleDateString("fr-FR", {
                 weekday: "long",
                 day: "numeric",
                 month: "long",
               })}
             </p>
+            {/* <div className="text-3xl font-mono text-sage-700">
+              {currentTime}
+            </div> */}
           </div>
-          <div className="text-3xl font-mono text-sage-700">{currentTime}</div>
         </motion.div>
       </header>
 
