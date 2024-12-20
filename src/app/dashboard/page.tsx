@@ -78,14 +78,14 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-sage-50 p-8">
       {/* En-tête */}
-      <header className="mb-4 ml-10 lg:ml-16 lg:mb-6">
+      <header className="mb-4 mt-12 lg:ml-16 lg:mb-6 lg:mt-0">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex justify-between items-center"
         >
           <div className="flex flex-col items-center w-full lg:flex-row lg:justify-between lg:items-center">
-            <h1 className="text-4xl font-bold text-sage-800">
+            <h1 className="text-2xl font-bold text-sage-800 lg:text-4xl">
               Bonjour{" "}
               <span className="text-emerald-600">{session?.user?.name}</span>
             </h1>
@@ -107,7 +107,7 @@ export default function DashboardPage() {
       <motion.div
         initial={{ opacity: 0, scaleX: 0 }}
         animate={{ opacity: 1, scaleX: 1 }}
-        className="mb-12 bg-sage-200 rounded-full h-4 overflow-hidden"
+        className="mb-10 bg-sage-200 rounded-full h-4 overflow-hidden"
       >
         <motion.div
           initial={{ width: 0 }}
