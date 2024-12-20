@@ -78,7 +78,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-sage-50 p-8">
       {/* En-tête */}
-      <header className="mb-4 ml-16 lg:mb-6">
+      <header className="mb-4 ml-10 lg:ml-16 lg:mb-6">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -89,7 +89,7 @@ export default function DashboardPage() {
               Bonjour{" "}
               <span className="text-emerald-600">{session?.user?.name}</span>
             </h1>
-            <p className="text-3xl font-mono text-sage-700 mt-2 lg:mt-0">
+            <p className="text-xl font-mono text-sage-700 mt-2 lg:mt-0 lg:text-3xl">
               {new Date().toLocaleDateString("fr-FR", {
                 weekday: "long",
                 day: "numeric",

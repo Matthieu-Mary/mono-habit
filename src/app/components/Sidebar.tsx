@@ -63,7 +63,7 @@ export default function Sidebar() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsOpen(false)}
-              className="p-2 rounded-full hover:bg-sage-100"
+              className="p-2 rounded-full bg-sage-100 hover:bg-sage-200"
             >
               <svg
                 className="w-5 h-5 text-sage-600"
@@ -83,11 +83,11 @@ export default function Sidebar() {
 
           {/* Navigation */}
           <nav className="flex-1">
-            <ul className="space-y-4">
+            <ul className="space-y-3">
               <li>
                 <a
                   href="/dashboard"
-                  className="flex items-center space-x-3 p-3 rounded-xl hover:bg-sage-50 transition-colors"
+                  className="flex items-center space-x-3 p-3 rounded-xl bg-sage-50 hover:bg-sage-100 transition-colors"
                 >
                   <span className="p-2 bg-emerald-100 rounded-lg">🏠</span>
                   <span>Tableau de bord</span>
@@ -96,7 +96,7 @@ export default function Sidebar() {
               <li>
                 <a
                   href="/dashboard/historic"
-                  className="flex items-center space-x-3 p-3 rounded-xl hover:bg-sage-50 transition-colors"
+                  className="flex items-center space-x-3 p-3 rounded-xl bg-sage-50 hover:bg-sage-100 transition-colors"
                 >
                   <span className="p-2 bg-emerald-100 rounded-lg">📅</span>
                   <span>Historique</span>
