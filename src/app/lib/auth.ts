@@ -52,12 +52,20 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  session: {
+    strategy: "jwt",
+  },
   callbacks: {
-    session: async ({ session, token, user }) => {
-      if (session?.user && user) {
-        session.user.id = user.id;
-      } else if (session?.user && token?.sub) {
-        session.user.id = token.sub;
+    async jwt({ token, user }) {
+      if (user) {
+        token.user = user;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token?.user) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        session.user = token.user as any;
       }
       return session;
     },
