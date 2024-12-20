@@ -14,16 +14,35 @@ export async function POST(
     }
 
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const startOfDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      0,
+      0,
+      0
+    );
+    const endOfDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      23,
+      59,
+      59
+    );
 
     await prisma.habitLog.updateMany({
       where: {
         habitId: params.id,
         userId: session.user.id,
-        date: today,
+        date: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
       },
       data: {
         completed: true,
+        completedAt: new Date(),
       },
     });
 

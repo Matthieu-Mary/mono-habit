@@ -50,18 +50,19 @@ model Habit {
 }
 
 model HabitLog {
-  id        String    @id @default(cuid())
-  date      DateTime
-  completed Boolean   @default(false)
-  notes     String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id          String    @id @default(cuid())
+  date        DateTime
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   
   // Relations
-  habitId   String
-  habit     Habit     @relation(fields: [habitId], references: [id], onDelete: Cascade)
-  userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  habitId     String
+  habit       Habit     @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([habitId])
   @@index([userId])
