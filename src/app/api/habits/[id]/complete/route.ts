@@ -3,11 +3,9 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "../../../../lib/auth";
 
-export async function POST(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: Request, context: { params: { id: string } }) {
   try {
+    const { params } = context;
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return new NextResponse("Non autorisé", { status: 401 });

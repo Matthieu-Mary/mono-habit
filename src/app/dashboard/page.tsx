@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import TaskModal from "../components/TaskModal";
 import TaskCard from "../components/TaskCard";
 import Loader from "../components/Loader";
+import Celebration from "../components/Celebration";
 
 function calculateTimeRemaining(): string {
   const now = new Date();
@@ -48,6 +49,7 @@ export default function DashboardPage() {
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [timeRemaining, setTimeRemaining] = useState<string>("");
+  const [showCelebration, setShowCelebration] = useState(false);
 
   useEffect(() => {
     // Mettre à jour le temps restant immédiatement
@@ -125,6 +127,7 @@ export default function DashboardPage() {
       }
 
       setIsCompleted(true);
+      setShowCelebration(true);
       await fetchTodayTask();
     } catch (error) {
       console.error("Erreur:", error);
@@ -150,6 +153,10 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-sage-50 p-8">
+      <Celebration
+        isVisible={showCelebration}
+        onComplete={() => setShowCelebration(false)}
+      />
       {/* En-tête */}
       <header className="mb-4 mt-12 lg:ml-16 lg:mb-6 lg:mt-0">
         <motion.div
