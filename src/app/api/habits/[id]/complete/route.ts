@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "../../../../lib/auth";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request, context: { params: { id: string } }) {
   try {
     const { params } = context;

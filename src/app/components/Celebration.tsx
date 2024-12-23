@@ -139,7 +139,7 @@ export default function Celebration({
                     repeat: 1,
                     ease: "easeInOut",
                   }}
-                  className="text-5xl font-bold text-emerald-500 bg-white/95 px-10 py-6 rounded-full shadow-2xl"
+                  className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-emerald-500 bg-white/95 px-4 sm:px-6 md:px-8 lg:px-10 py-3 sm:py-4 md:py-5 lg:py-6 rounded-full shadow-2xl whitespace-nowrap"
                 >
                   Objectif atteint ! 🌟
                 </motion.h2>
