@@ -50,18 +50,21 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [showCelebration, setShowCelebration] = useState(false);
+  const [isLoadingStatus, setIsLoadingStatus] = useState(false);
 
   useEffect(() => {
-    // Mettre à jour le temps restant immédiatement
-    setTimeRemaining(calculateTimeRemaining());
-
-    // Mettre à jour toutes les minutes
-    const interval = setInterval(() => {
+    // Mettre à jour le temps restant seulement si la tâche n'est pas complétée
+    if (!isLoading && !isCompleted) {
       setTimeRemaining(calculateTimeRemaining());
-    }, 60000);
 
-    return () => clearInterval(interval);
-  }, []);
+      // Mettre à jour toutes les minutes
+      const interval = setInterval(() => {
+        setTimeRemaining(calculateTimeRemaining());
+      }, 60000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isCompleted, isLoading]);
 
   const fetchTodayTask = useCallback(async () => {
     try {
@@ -117,6 +120,7 @@ export default function DashboardPage() {
     if (!currentTask?.id) return;
 
     setIsLoading(true);
+    setIsLoadingStatus(true);
     try {
       const response = await fetch(`/api/habits/${currentTask.id}/complete`, {
         method: "POST",
@@ -133,6 +137,7 @@ export default function DashboardPage() {
       console.error("Erreur:", error);
     } finally {
       setIsLoading(false);
+      setIsLoadingStatus(false);
     }
   };
 
@@ -217,8 +222,19 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-2xl p-4 shadow-lg mb-8 text-center lg:text-left"
       >
-        <p className="text-sm font-mono text-sage-700 lg:text-lg ">
-          {timeRemaining}
+        <p className="text-sm font-mono text-sage-700 lg:text-lg">
+          {isLoadingStatus || isLoading ? (
+            <Loader size="sm" />
+          ) : isCompleted ? (
+            <>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 font-bold">
+                ✨ Félicitations ✨
+              </span>
+              , vous avez accompli votre objectif du jour !
+            </>
+          ) : (
+            timeRemaining
+          )}
         </p>
       </motion.div>
 
