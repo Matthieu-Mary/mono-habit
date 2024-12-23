@@ -7,6 +7,7 @@ import TaskModal from "../components/TaskModal";
 import TaskCard from "../components/TaskCard";
 import Loader from "../components/Loader";
 import Celebration from "../components/Celebration";
+import MonthlyProgress from "../components/MonthlyProgress";
 
 function calculateTimeRemaining(): string {
   const now = new Date();
@@ -51,6 +52,9 @@ export default function DashboardPage() {
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [showCelebration, setShowCelebration] = useState(false);
   const [isLoadingStatus, setIsLoadingStatus] = useState(false);
+  const [monthlyHabits, setMonthlyHabits] = useState<
+    Array<{ date: string; completed: boolean }>
+  >([]);
 
   useEffect(() => {
     // Mettre à jour le temps restant seulement si la tâche n'est pas complétée
@@ -140,6 +144,21 @@ export default function DashboardPage() {
       setIsLoadingStatus(false);
     }
   };
+
+  const fetchMonthlyHabits = useCallback(async () => {
+    try {
+      const response = await fetch("/api/habits/monthly");
+      if (!response.ok) throw new Error("Erreur lors du chargement");
+      const data = await response.json();
+      setMonthlyHabits(data.habits);
+    } catch (error) {
+      console.error("Erreur:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchMonthlyHabits();
+  }, [fetchMonthlyHabits]);
 
   if (status === "loading") {
     return (
@@ -279,21 +298,9 @@ export default function DashboardPage() {
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-white rounded-2xl p-8 shadow-lg"
+          className="h-full"
         >
-          <h2 className="text-2xl font-semibold text-sage-800 mb-6">
-            Actions rapides
-          </h2>
-          <div className="space-y-4">
-            <button className="w-full p-4 text-left bg-sage-50 hover:bg-sage-100 rounded-xl transition-colors flex items-center gap-4">
-              <span className="p-2 bg-emerald-100 rounded-lg">📅</span>
-              Voir l&apos;historique
-            </button>
-            <button className="w-full p-4 text-left bg-sage-50 hover:bg-sage-100 rounded-xl transition-colors flex items-center gap-4">
-              <span className="p-2 bg-emerald-100 rounded-lg">🎯</span>
-              Programmer une tâche
-            </button>
-          </div>
+          <MonthlyProgress habits={monthlyHabits} />
         </motion.div>
       </div>
 
