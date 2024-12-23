@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import TaskModal from "../components/TaskModal";
 import TaskCard from "../components/TaskCard";
+import Loader from "../components/Loader";
 
 function calculateTimeRemaining(): string {
   const now = new Date();
@@ -110,10 +111,32 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, []);
 
+  const handleCompleteTask = async () => {
+    if (!currentTask?.id) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/habits/${currentTask.id}/complete`, {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la complétion de la tâche");
+      }
+
+      setIsCompleted(true);
+      await fetchTodayTask();
+    } catch (error) {
+      console.error("Erreur:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+        <Loader size="lg" />
       </div>
     );
   }
@@ -187,7 +210,9 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-2xl p-4 shadow-lg mb-8 text-center lg:text-left"
       >
-        <p className="text-sm font-mono text-sage-700 lg:text-lg " >{timeRemaining}</p>
+        <p className="text-sm font-mono text-sage-700 lg:text-lg ">
+          {timeRemaining}
+        </p>
       </motion.div>
 
       {/* Contenu principal */}
@@ -196,14 +221,23 @@ export default function DashboardPage() {
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-white rounded-2xl p-8 shadow-lg"
+          className="bg-white rounded-2xl p-8 shadow-lg relative"
         >
           <h2 className="text-2xl font-semibold text-sage-800 mb-6">
             Tâche du jour
           </h2>
 
-          {currentTask ? (
-            <TaskCard task={currentTask} isCompleted={isCompleted} />
+          {isLoading ? (
+            <div className="h-60 flex items-center justify-center">
+              <Loader size="md" />
+            </div>
+          ) : currentTask ? (
+            <TaskCard
+              task={currentTask}
+              isCompleted={isCompleted}
+              isLoading={isLoading}
+              onComplete={handleCompleteTask}
+            />
           ) : (
             <div className="flex items-center justify-center h-40 border-2 border-dashed border-sage-300 rounded-xl">
               <motion.button
