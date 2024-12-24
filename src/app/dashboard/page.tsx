@@ -258,49 +258,64 @@ export default function DashboardPage() {
       </motion.div>
 
       {/* Contenu principal */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Tâche du jour */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="bg-white rounded-2xl p-8 shadow-lg relative"
-        >
-          <h2 className="text-2xl font-semibold text-sage-800 mb-6">
-            Tâche du jour
-          </h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="flex flex-col gap-8 lg:h-full">
+          {/* Tâche du jour */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-white rounded-2xl p-8 shadow-lg relative"
+          >
+            <h2 className="text-2xl font-semibold text-sage-800 mb-6">
+              Tâche du jour
+            </h2>
 
-          {isLoading ? (
-            <div className="h-60 flex items-center justify-center">
-              <Loader size="md" />
-            </div>
-          ) : currentTask ? (
-            <TaskCard
-              task={currentTask}
-              isCompleted={isCompleted}
-              isLoading={isLoading}
-              onComplete={handleCompleteTask}
-            />
-          ) : (
-            <div className="flex items-center justify-center h-40 border-2 border-dashed border-sage-300 rounded-xl">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-6 py-3 bg-emerald-500 text-white rounded-full hover:bg-emerald-600 transition-colors"
-                onClick={() => setIsModalOpen(true)}
-              >
-                + Ajouter une tâche
-              </motion.button>
-            </div>
-          )}
-        </motion.div>
+            {isLoading ? (
+              <div className="h-60 flex items-center justify-center">
+                <Loader size="md" />
+              </div>
+            ) : currentTask ? (
+              <TaskCard
+                task={currentTask}
+                isCompleted={isCompleted}
+                isLoading={isLoading}
+                onComplete={handleCompleteTask}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-40 border-2 border-dashed border-sage-300 rounded-xl">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-6 py-3 bg-emerald-500 text-white rounded-full hover:bg-emerald-600 transition-colors"
+                  onClick={() => setIsModalOpen(true)}
+                >
+                  + Ajouter une tâche
+                </motion.button>
+              </div>
+            )}
+          </motion.div>
 
-        {/* Actions rapides */}
+          {/* Actions rapides */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-white rounded-2xl p-8 shadow-lg relative flex-1"
+          >
+            <h2 className="text-2xl font-semibold text-sage-800 mb-6">
+              A déterminer
+            </h2>
+          </motion.div>
+        </div>
+
+        {/* Historique des habitudes */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           className="h-full"
         >
-          <MonthlyProgress habits={monthlyHabits} />
+          <div className="h-full">
+            <MonthlyProgress habits={monthlyHabits} />
+          </div>
         </motion.div>
       </div>
 
