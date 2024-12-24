@@ -55,6 +55,11 @@ export default function DashboardPage() {
   const [monthlyHabits, setMonthlyHabits] = useState<
     Array<{ date: string; completed: boolean }>
   >([]);
+  const [tomorrowTask, setTomorrowTask] = useState<{
+    id: string;
+    title: string;
+    description?: string;
+  } | null>(null);
 
   useEffect(() => {
     // Mettre à jour le temps restant seulement si la tâche n'est pas complétée
@@ -160,6 +165,21 @@ export default function DashboardPage() {
     fetchMonthlyHabits();
   }, [fetchMonthlyHabits]);
 
+  const fetchTomorrowTask = useCallback(async () => {
+    try {
+      const response = await fetch("/api/habits/tomorrow");
+      if (!response.ok) throw new Error("Erreur lors du chargement");
+      const data = await response.json();
+      setTomorrowTask(data.habit || null);
+    } catch (error) {
+      console.error("Erreur:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTomorrowTask();
+  }, [fetchTomorrowTask]);
+
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -176,7 +196,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-sage-50 p-8">
+    <div className="min-h-screen bg-sage-50 p-8 pb-16">
       <Celebration
         isVisible={showCelebration}
         onComplete={() => setShowCelebration(false)}
@@ -295,15 +315,53 @@ export default function DashboardPage() {
             )}
           </motion.div>
 
-          {/* Actions rapides */}
+          {/* Bloc infos */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="bg-white rounded-2xl p-8 shadow-lg relative flex-1"
           >
-            <h2 className="text-2xl font-semibold text-sage-800 mb-6">
-              A déterminer
-            </h2>
+            <h2 className="text-2xl font-semibold text-sage-800 mb-6">Infos</h2>
+            <div className="space-y-3 h-full flex flex-col">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="bg-sage-50 p-3 rounded-xl text-center sm:text-left">
+                  <h3 className="text-sm text-sage-600">Taux de réussite</h3>
+                  <p className="text-xl font-bold text-emerald-600">87%</p>
+                  <p className="text-xs text-sage-500">Ce mois-ci</p>
+                </div>
+                <div className="bg-sage-50 p-3 rounded-xl text-center sm:text-left">
+                  <h3 className="text-sm text-sage-600">Série actuelle</h3>
+                  <p className="text-xl font-bold text-emerald-600">5 jours</p>
+                  <p className="text-xs text-sage-500">Record : 12 jours</p>
+                </div>
+              </div>
+              <div className="bg-sage-50 p-4 rounded-xl">
+                <h3 className="text-lg font-medium text-sage-800 mb-3">
+                  Préparez-vous pour la tâche de demain
+                </h3>
+                {tomorrowTask ? (
+                  <div className="space-y-2">
+                    <p className="text-sage-700">{tomorrowTask.title}</p>
+                    {tomorrowTask.description && (
+                      <p className="text-sm text-sage-600">
+                        {tomorrowTask.description}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center py-3">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="px-4 py-2 bg-emerald-500 text-white text-sm rounded-full hover:bg-emerald-600 transition-colors"
+                      onClick={() => setIsModalOpen(true)}
+                    >
+                      Planifier la tâche de demain
+                    </motion.button>
+                  </div>
+                )}
+              </div>
+            </div>
           </motion.div>
         </div>
 
