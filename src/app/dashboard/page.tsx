@@ -181,7 +181,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-sage-50 p-8 pb-16">
+    <div className="min-h-screen pb-48 bg-sage-50 p-8 lg:pb-16">
       <Celebration
         isVisible={showCelebration}
         onComplete={() => setShowCelebration(false)}
@@ -309,18 +309,18 @@ export default function DashboardPage() {
             <h2 className="text-2xl font-semibold text-sage-800 mb-6">Infos</h2>
             <div className="space-y-3 h-full flex flex-col">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="bg-sage-50 p-3 rounded-xl text-center sm:text-left">
+                <div className="bg-sage-50 py-3 px-5 rounded-xl text-center sm:text-left">
                   <h3 className="text-sm text-sage-600">Taux de réussite</h3>
-                  <p className="text-xl font-bold text-emerald-600">87%</p>
+                  <p className="text-2xl font-bold text-emerald-600">87%</p>
                   <p className="text-xs text-sage-500">Ce mois-ci</p>
                 </div>
-                <div className="bg-sage-50 p-3 rounded-xl text-center sm:text-left">
+                <div className="bg-sage-50 py-3 px-5 rounded-xl text-center sm:text-left">
                   <h3 className="text-sm text-sage-600">Série actuelle</h3>
-                  <p className="text-xl font-bold text-emerald-600">5 jours</p>
+                  <p className="text-2xl font-bold text-emerald-600">5 jours</p>
                   <p className="text-xs text-sage-500">Record : 12 jours</p>
                 </div>
               </div>
-            </div>
+            </div>min-h-screen 
           </motion.div>
         </div>
 

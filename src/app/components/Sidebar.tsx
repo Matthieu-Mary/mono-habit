@@ -14,7 +14,7 @@ export default function Sidebar() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-5 left-6 z-30 p-3 bg-white rounded-full shadow-lg"
+        className="fixed top-5 left-6 z-30 p-3 bg-white rounded-full shadow-lg text-sage-800"
       >
         <svg
           className={`w-6 h-6 transition-transform ${
@@ -41,7 +41,7 @@ export default function Sidebar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsOpen(false)}
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 text-sage-800"
           />
         )}
       </AnimatePresence>
@@ -51,7 +51,7 @@ export default function Sidebar() {
         initial={{ x: "-100%" }}
         animate={{ x: isOpen ? 0 : "-100%" }}
         transition={{ type: "spring", damping: 20 }}
-        className="fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 py-6 px-4"
+        className="fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 py-6 px-4 text-sage-800"
       >
         <div className="flex flex-col h-full">
           {/* Logo ou titre */}

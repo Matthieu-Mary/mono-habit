@@ -82,7 +82,7 @@ export default function TaskModal({
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
-            className="bg-white rounded-3xl p-8 shadow-xl max-w-md w-full mx-4 relative"
+            className="bg-white rounded-3xl p-8 shadow-xl max-w-md w-full mx-4 relative text-sage-800"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="absolute -top-2 -left-2 w-full h-full bg-emerald-100 rounded-3xl -z-10 transform rotate-1"></div>
