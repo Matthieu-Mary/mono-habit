@@ -52,14 +52,14 @@ export default function Register() {
         <form onSubmit={handleRegister} className="space-y-6">
           {error && (
             <div className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-md p-3">
-              {error}
+              {"Une erreur est survenue lors de l'inscription, assurez-vous que votre email ou nom d'utilisateur ne sont pas déjà utilisés"}
             </div>
           )}
 
           <div>
             <label
               htmlFor="username"
-              className="block text-sm font-medium text-sage-700"
+              className="block text-sm font-meédium text-sage-700"
             >
               Nom d&apos;utilisateur
             </label>
