@@ -1,70 +1,42 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { authOptions } from "@/lib/auth";
+import { prisma } from "../../lib/db";
+import { authOptions } from "../../lib/auth";
 
-export async function GET() {
+// Créer la tâche du jour
+export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
-    }
-
-    const habits = await prisma.habit.findMany({
-      where: {
-        userId: session.user.id,
-      },
-      include: {
-        completions: {
-          orderBy: {
-            date: 'desc'
-          },
-          take: 30, // Récupère les 30 derniers jours
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
+    if (!session?.user?.id) {
+        return new NextResponse("Non autorisé", { status: 401 });
       }
-    });
 
-    // Formater les données pour inclure l'état de chaque jour
-    const formattedHabits = habits.map(habit => {
-      const completionMap = new Map(
-        habit.completions.map(completion => [
-          completion.date.toISOString().split('T')[0],
-          completion.completed
-        ])
-      );
+      const { title, description } = await req.json();
 
-      // Créer un tableau des 30 derniers jours
-      const last30Days = [...Array(30)].map((_, i) => {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const dateStr = date.toISOString().split('T')[0];
-        
-        return {
-          date: dateStr,
-          completed: completionMap.get(dateStr) ?? false
-        };
+      const habit = await prisma.habit.create({
+        data: {
+          name: title,
+          description,
+          userId: session.user.id,
+          startDate: new Date(),
+        },
       });
 
-      return {
-        id: habit.id,
-        title: habit.title,
-        description: habit.description,
-        createdAt: habit.createdAt,
-        completionHistory: last30Days
-      };
-    });
+    // Créer le HabitLog pour aujourd'hui
+    await prisma.habitLog.create({
+        data: {
+          habitId: habit.id,
+          userId: session.user.id,
+          date: new Date(),
+          completed: false,
+        },
+      });
 
-    return NextResponse.json(formattedHabits);
+      return NextResponse.json(habit);
     
   } catch (error) {
-    console.error("Erreur lors de la récupération des habitudes:", error);
-    return NextResponse.json(
-      { error: "Erreur lors de la récupération des habitudes" },
-      { status: 500 }
-    );
+    console.error(error);
+    return new NextResponse("Erreur interne", { status: 500 });
   }
 }

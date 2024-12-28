@@ -34,8 +34,9 @@ model User {
 // Sert à enregistrer les habitudes (ex: manger une pomme, lire un livre, etc.)
 model Habit {
   id          String       @id @default(cuid())
-  title       String
+  name       String
   description String?
+  startDate   DateTime @default(now())
   userId      String
   user        User         @relation(fields: [userId], references: [id])
   createdAt   DateTime     @default(now())

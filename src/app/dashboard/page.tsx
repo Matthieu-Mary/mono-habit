@@ -145,20 +145,29 @@ export default function DashboardPage() {
     }
   };
 
-  const fetchMonthlyHabits = useCallback(async () => {
-    try {
-      const response = await fetch("/api/habits/monthly");
-      if (!response.ok) throw new Error("Erreur lors du chargement");
-      const data = await response.json();
-      setMonthlyHabits(data.habits);
-    } catch (error) {
-      console.error("Erreur:", error);
-    }
-  }, []);
+  // On récupère les habitudes du mois en cours pour les afficher dans le graphique
+  // const fetchMonthlyHabits = useCallback(async () => {
+  //   try {
+  //     const response = await fetch("/api/habits/monthly");
+  //     console.log(response)
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       throw new Error(errorData.error || "Erreur lors du chargement");
+  //     }
+  //     const data = await response.json();
+  //     setMonthlyHabits(data.habits || []);
+  //   } catch (error) {   
+  //     console.error("Erreur détaillée:", error);
+  //     // Initialiser avec un tableau vide en cas d'erreur
+  //     setMonthlyHabits([]);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    fetchMonthlyHabits();
-  }, [fetchMonthlyHabits]);
+  // useEffect(() => {
+  //   fetchMonthlyHabits();
+  // }, [fetchMonthlyHabits]);
 
   if (status === "loading") {
     return (
