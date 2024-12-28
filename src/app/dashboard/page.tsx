@@ -55,11 +55,6 @@ export default function DashboardPage() {
   const [monthlyHabits, setMonthlyHabits] = useState<
     Array<{ date: string; completed: boolean }>
   >([]);
-  const [tomorrowTask, setTomorrowTask] = useState<{
-    id: string;
-    title: string;
-    description?: string;
-  } | null>(null);
 
   useEffect(() => {
     // Mettre à jour le temps restant seulement si la tâche n'est pas complétée
@@ -246,7 +241,7 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-2xl p-4 shadow-lg mb-8 text-center lg:text-left"
       >
-        <p className="text-sm font-mono text-sage-700 lg:text-lg">
+        <div className="text-sm font-mono text-sage-700 lg:text-lg">
           {isLoadingStatus || isLoading ? (
             <Loader size="sm" />
           ) : isCompleted ? (
@@ -259,7 +254,7 @@ export default function DashboardPage() {
           ) : (
             timeRemaining
           )}
-        </p>
+        </div>
       </motion.div>
 
       {/* Contenu principal */}

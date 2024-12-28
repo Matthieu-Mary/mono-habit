@@ -9,45 +9,39 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
 // User model
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
+  id            String       @id @default(cuid())
+  email         String       @unique
   username      String
-  password      String     // assurez-vous que ce champ existe
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  password      String // assurez-vous que ce champ existe
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
   habits        Habit[]
   habitLogs     HabitLog[]
+  Completion    Completion[]
 }
 
 // Sert à enregistrer les habitudes (ex: manger une pomme, lire un livre, etc.)
 model Habit {
-  id          String    @id @default(cuid())
-  name        String
+  id          String       @id @default(cuid())
+  title       String
   description String?
-  frequency   Frequency @default(DAILY)
-  startDate   DateTime  @default(now())
-  endDate     DateTime?
-  isArchived  Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
-  // Relations
   userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  habitLogs   HabitLog[]
-
-  @@index([userId])
+  user        User         @relation(fields: [userId], references: [id])
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  completions Completion[]
+  HabitLog    HabitLog[]
 }
 
 // Sert à enregistrer les logs des habitudes (ex: si on a mangé une pomme aujourd'hui, on enregistre le log)
@@ -59,16 +53,16 @@ model HabitLog {
   notes       String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  
-  // Relations
-  habitId     String
-  habit       Habit     @relation(fields: [habitId], references: [id], onDelete: Cascade)
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  // Relations
+  habitId String
+  habit   Habit  @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([habitId, date])
   @@index([habitId])
   @@index([userId])
-  @@unique([habitId, date])
 }
 
 enum Frequency {
@@ -80,18 +74,18 @@ enum Frequency {
 
 // Auth.js Models
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -117,4 +111,16 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Completion {
+  id        String   @id @default(cuid())
+  habitId   String
+  habit     Habit    @relation(fields: [habitId], references: [id])
+  completed Boolean  @default(false)
+  date      DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([habitId, date])
 }

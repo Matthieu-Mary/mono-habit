@@ -1,40 +1,70 @@
-import { prisma } from "../../lib/db";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import { authOptions } from "../../lib/auth";
+import prisma from "@/lib/prisma";
+import { authOptions } from "@/lib/auth";
 
-export async function POST(req: Request) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-      return new NextResponse("Non autorisé", { status: 401 });
+
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    const { title, description } = await req.json();
-
-    const habit = await prisma.habit.create({
-      data: {
-        name: title,
-        description,
+    const habits = await prisma.habit.findMany({
+      where: {
         userId: session.user.id,
-        frequency: "DAILY",
-        startDate: new Date(),
       },
+      include: {
+        completions: {
+          orderBy: {
+            date: 'desc'
+          },
+          take: 30, // Récupère les 30 derniers jours
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
 
-    // Créer le HabitLog pour aujourd'hui
-    await prisma.habitLog.create({
-      data: {
-        habitId: habit.id,
-        userId: session.user.id,
-        date: new Date(),
-        completed: false,
-      },
+    // Formater les données pour inclure l'état de chaque jour
+    const formattedHabits = habits.map(habit => {
+      const completionMap = new Map(
+        habit.completions.map(completion => [
+          completion.date.toISOString().split('T')[0],
+          completion.completed
+        ])
+      );
+
+      // Créer un tableau des 30 derniers jours
+      const last30Days = [...Array(30)].map((_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        
+        return {
+          date: dateStr,
+          completed: completionMap.get(dateStr) ?? false
+        };
+      });
+
+      return {
+        id: habit.id,
+        title: habit.title,
+        description: habit.description,
+        createdAt: habit.createdAt,
+        completionHistory: last30Days
+      };
     });
 
-    return NextResponse.json(habit);
+    return NextResponse.json(formattedHabits);
+    
   } catch (error) {
-    console.error(error);
-    return new NextResponse("Erreur interne", { status: 500 });
+    console.error("Erreur lors de la récupération des habitudes:", error);
+    return NextResponse.json(
+      { error: "Erreur lors de la récupération des habitudes" },
+      { status: 500 }
+    );
   }
 }
