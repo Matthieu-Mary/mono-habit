@@ -331,7 +331,7 @@ export default function DashboardPage() {
                   <p className="text-xs text-sage-500">Record : 12 jours</p>
                 </div>
               </div>
-            </div>min-h-screen 
+            </div>
           </motion.div>
         </div>
 

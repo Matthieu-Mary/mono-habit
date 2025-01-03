@@ -18,12 +18,22 @@ export async function GET() {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "Utilisateur non trouvé" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Utilisateur non trouvé" },
+        { status: 404 }
+      );
     }
 
     const now = new Date();
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    const lastDayOfMonth = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0,
+      23,
+      59,
+      59
+    );
 
     const habits = await prisma.habit.findMany({
       where: {
@@ -42,33 +52,37 @@ export async function GET() {
     });
 
     const daysInMonth = lastDayOfMonth.getDate();
-    const formattedHabits = habits.map(habit => {
+    const formattedHabits = habits.map((habit) => {
       const completionMap = new Map(
-        habit.HabitLog
-          .filter(habitLog => habitLog.date instanceof Date)
-          .map(habitLog => [
-            habitLog.date.toISOString().split('T')[0],
-            habitLog.completed
-          ])
+        habit.HabitLog.filter((habitLog) => habitLog.date instanceof Date).map(
+          (habitLog) => [
+            habitLog.date.toISOString().split("T")[0],
+            habitLog.completed,
+          ]
+        )
       );
 
-      const status = habits.map(habit => habit.HabitLog.completed)
+      console.log(habits);
 
       const dailyStatus = Array.from({ length: daysInMonth }, (_, index) => {
-        const currentDate = new Date(now.getFullYear(), now.getMonth(), index + 1);
+        const currentDate = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          index + 1
+        );
         if (isNaN(currentDate.getTime())) {
           return {
-            date: '',
+            date: "",
             day: index + 1,
-            completed: false
+            completed: false,
           };
         }
-        
-        const dateStr = currentDate.toISOString().split('T')[0];
+
+        const dateStr = currentDate.toISOString().split("T")[0];
         return {
           date: dateStr,
           day: index + 1,
-          completed: completionMap.get(dateStr) ?? false
+          completed: completionMap.get(dateStr) ?? false,
         };
       });
 
@@ -84,14 +98,10 @@ export async function GET() {
       month: now.getMonth() + 1,
       year: now.getFullYear(),
       daysInMonth,
-      habits: formattedHabits
+      habits: formattedHabits,
     });
-
   } catch (error) {
     console.error("Erreur:", error);
-    return NextResponse.json(
-      { error: "Erreur serveur" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

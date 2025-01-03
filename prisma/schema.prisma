@@ -14,6 +14,14 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// enums
+enum Status {
+  UNSCHEDULED
+  PENDING
+  COMPLETED
+  MISSED
+}
+
 // User model
 model User {
   id            String       @id @default(cuid())
@@ -33,7 +41,7 @@ model User {
 // Sert à enregistrer les habitudes (ex: manger une pomme, lire un livre, etc.)
 model Habit {
   id          String       @id @default(cuid())
-  name       String
+  name        String
   description String?
   startDate   DateTime @default(now())
   userId      String
@@ -48,6 +56,7 @@ model HabitLog {
   id          String    @id @default(cuid())
   date        DateTime
   completed   Boolean   @default(false)
+  status      Status
   completedAt DateTime?
   notes       String?
   createdAt   DateTime  @default(now())
@@ -64,12 +73,6 @@ model HabitLog {
   @@index([userId])
 }
 
-enum Frequency {
-  DAILY
-  WEEKLY
-  MONTHLY
-  CUSTOM
-}
 
 // Auth.js Models
 model Account {

@@ -42,6 +42,7 @@ export async function POST(req: Request, context: { params: { id: string } }) {
       },
       data: {
         completed: true,
+        status: "COMPLETED",
         completedAt: new Date(),
       },
     });

@@ -9,32 +9,32 @@ export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-        return new NextResponse("Non autorisé", { status: 401 });
-      }
+      return new NextResponse("Non autorisé", { status: 401 });
+    }
 
-      const { title, description } = await req.json();
+    const { title, description } = await req.json();
 
-      const habit = await prisma.habit.create({
-        data: {
-          name: title,
-          description,
-          userId: session.user.id,
-          startDate: new Date(),
-        },
-      });
+    const habit = await prisma.habit.create({
+      data: {
+        name: title,
+        description,
+        userId: session.user.id,
+        startDate: new Date(),
+      },
+    });
 
     // Créer le HabitLog pour aujourd'hui
     await prisma.habitLog.create({
-        data: {
-          habitId: habit.id,
-          userId: session.user.id,
-          date: new Date(),
-          completed: false,
-        },
-      });
+      data: {
+        habitId: habit.id,
+        userId: session.user.id,
+        date: new Date(),
+        completed: false,
+        status: "PENDING",
+      },
+    });
 
-      return NextResponse.json(habit);
-    
+    return NextResponse.json(habit);
   } catch (error) {
     console.error(error);
     return new NextResponse("Erreur interne", { status: 500 });
