@@ -10,8 +10,14 @@ interface DayStatus {
 
 interface MonthlyProgressProps {
   habits: Array<{
-    date: string;
-    completed: boolean;
+    id: string;
+    title: string;
+    description: string | null;
+    dailyStatus: Array<{
+      date: string;
+      day: number;
+      completed: boolean;
+    }>;
   }>;
 }
 
@@ -23,24 +29,29 @@ const MonthlyProgress = ({ habits }: MonthlyProgressProps) => {
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth();
-
-    // Nom du mois en français, ex: "décembre"
+  
     setCurrentMonth(
       new Date(year, month).toLocaleString("fr-FR", { month: "long" })
     );
 
-    // Dernier jour du mois
     const lastDay = new Date(year, month + 1, 0);
-
-    // Créer un Map pour un accès direct (date -> completed?)
-    const habitsMap = new Map(
-      habits.map((habit) => [
-        new Date(habit.date).toISOString().split("T")[0],
-        habit.completed,
-      ])
-    );
-
     const daysInMonth: DayStatus[] = [];
+
+    // Créer un Map pour stocker le statut de chaque jour
+    const statusMap = new Map<string, boolean>();
+
+    // Combiner les statuts de toutes les habitudes
+    habits.forEach(habit => {
+      habit.dailyStatus.forEach(status => {
+        const dateKey = status.date;
+        // Si au moins une habitude est complétée ce jour-là, marquer comme complété
+        if (status.completed) {
+          statusMap.set(dateKey, true);
+        } else if (!statusMap.has(dateKey)) {
+          statusMap.set(dateKey, false);
+        }
+      });
+    });
 
     for (let d = 1; d <= lastDay.getDate(); d++) {
       const currentDate = new Date(year, month, d);
@@ -48,13 +59,10 @@ const MonthlyProgress = ({ habits }: MonthlyProgressProps) => {
 
       let status: DayStatus["status"] = "unscheduled";
 
-      // Si la date est dans le futur
       if (currentDate > now) {
         status = "future";
-      }
-      // Si la date est présente dans le Map
-      else if (habitsMap.has(dateString)) {
-        status = habitsMap.get(dateString) ? "completed" : "missed";
+      } else if (statusMap.has(dateString)) {
+        status = statusMap.get(dateString) ? "completed" : "missed";
       }
 
       daysInMonth.push({

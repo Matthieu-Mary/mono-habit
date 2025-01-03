@@ -28,7 +28,6 @@ model User {
   sessions      Session[]
   habits        Habit[]
   habitLogs     HabitLog[]
-  Completion    Completion[]
 }
 
 // Sert à enregistrer les habitudes (ex: manger une pomme, lire un livre, etc.)
@@ -41,7 +40,6 @@ model Habit {
   user        User         @relation(fields: [userId], references: [id])
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  completions Completion[]
   HabitLog    HabitLog[]
 }
 
@@ -114,14 +112,3 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model Completion {
-  id        String   @id @default(cuid())
-  habitId   String
-  habit     Habit    @relation(fields: [habitId], references: [id])
-  completed Boolean  @default(false)
-  date      DateTime @default(now())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-
-  @@unique([habitId, date])
-}

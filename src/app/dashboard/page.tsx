@@ -52,9 +52,16 @@ export default function DashboardPage() {
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [showCelebration, setShowCelebration] = useState(false);
   const [isLoadingStatus, setIsLoadingStatus] = useState(false);
-  const [monthlyHabits, setMonthlyHabits] = useState<
-    Array<{ date: string; completed: boolean }>
-  >([]);
+  const [monthlyHabits, setMonthlyHabits] = useState<Array<{
+    id: string;
+    title: string;
+    description: string | null;
+    dailyStatus: Array<{
+      date: string;
+      day: number;
+      completed: boolean;
+    }>;
+  }>>([]);
 
   useEffect(() => {
     // Mettre à jour le temps restant seulement si la tâche n'est pas complétée
@@ -154,6 +161,7 @@ export default function DashboardPage() {
         throw new Error(errorData.error || "Erreur lors du chargement des habitudes du mois en cours");
       }
       const data = await response.json();
+      console.log("data", data)
       setMonthlyHabits(data.habits || []);
     } catch (error) {   
       console.error("Erreur détaillée:", error);

@@ -5,15 +5,12 @@ import { authOptions } from "../../../lib/auth";
 
 export async function GET() {
   try {
-
     const session = await getServerSession(authOptions);
 
-    // Vérification de la session
     if (!session) {
       return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
     }
 
-    // Récupérer l'utilisateur depuis la base de données
     const user = await prisma.user.findUnique({
       where: {
         email: session.user?.email as string,
@@ -26,14 +23,14 @@ export async function GET() {
 
     const now = new Date();
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
 
     const habits = await prisma.habit.findMany({
       where: {
         userId: user.id,
       },
       include: {
-        completions: {
+        HabitLog: {
           where: {
             date: {
               gte: firstDayOfMonth,
@@ -44,21 +41,30 @@ export async function GET() {
       },
     });
 
-    console.log(habits)
-
     const daysInMonth = lastDayOfMonth.getDate();
     const formattedHabits = habits.map(habit => {
       const completionMap = new Map(
-        habit.completions.map(completion => [
-          completion.date.toISOString().split('T')[0],
-          completion.completed
-        ])
+        habit.HabitLog
+          .filter(habitLog => habitLog.date instanceof Date)
+          .map(habitLog => [
+            habitLog.date.toISOString().split('T')[0],
+            habitLog.completed
+          ])
       );
 
+      const status = habits.map(habit => habit.HabitLog.completed)
+
       const dailyStatus = Array.from({ length: daysInMonth }, (_, index) => {
-        const date = new Date(now.getFullYear(), now.getMonth(), index + 1);
-        const dateStr = date.toISOString().split('T')[0];
+        const currentDate = new Date(now.getFullYear(), now.getMonth(), index + 1);
+        if (isNaN(currentDate.getTime())) {
+          return {
+            date: '',
+            day: index + 1,
+            completed: false
+          };
+        }
         
+        const dateStr = currentDate.toISOString().split('T')[0];
         return {
           date: dateStr,
           day: index + 1,
@@ -74,8 +80,6 @@ export async function GET() {
       };
     });
 
-    console.log(formattedHabits)
-
     return NextResponse.json({
       month: now.getMonth() + 1,
       year: now.getFullYear(),
@@ -83,7 +87,6 @@ export async function GET() {
       habits: formattedHabits
     });
 
-    return NextResponse.json({ habits });
   } catch (error) {
     console.error("Erreur:", error);
     return NextResponse.json(
