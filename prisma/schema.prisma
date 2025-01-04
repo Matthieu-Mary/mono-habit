@@ -24,12 +24,12 @@ enum Status {
 
 // User model
 model User {
-  id            String       @id @default(cuid())
-  email         String       @unique
+  id            String     @id @default(cuid())
+  email         String     @unique
   username      String
-  password      String // assurez-vous que ce champ existe
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  password      String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
   emailVerified DateTime?
   image         String?
   accounts      Account[]
@@ -40,14 +40,14 @@ model User {
 
 // Sert à enregistrer les habitudes (ex: manger une pomme, lire un livre, etc.)
 model Habit {
-  id          String       @id @default(cuid())
+  id          String     @id @default(cuid())
   name        String
   description String?
-  startDate   DateTime @default(now())
+  startDate   DateTime   @default(now())
   userId      String
-  user        User         @relation(fields: [userId], references: [id])
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  user        User       @relation(fields: [userId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   HabitLog    HabitLog[]
 }
 
@@ -73,8 +73,7 @@ model HabitLog {
   @@index([userId])
 }
 
-
-// Auth.js Models
+// Auth.js Models (UTILE ???)
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -114,4 +113,3 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
-

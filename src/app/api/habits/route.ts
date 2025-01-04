@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     if (!session?.user?.id) {
       return new NextResponse("Non autorisé", { status: 401 });
     }
-
+ 
     const { title, description } = await req.json();
 
     const habit = await prisma.habit.create({
