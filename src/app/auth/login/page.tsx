@@ -28,7 +28,6 @@ export default function Login() {
     });
 
     if (res?.ok) {
-      console.log("Connexion réussie");
       router.push("/dashboard");
     } else {
       setError("Identifiants invalides ou erreur.");

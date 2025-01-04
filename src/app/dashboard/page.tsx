@@ -161,7 +161,6 @@ export default function DashboardPage() {
         throw new Error(errorData.error || "Erreur lors du chargement des habitudes du mois en cours");
       }
       const data = await response.json();
-      console.log("data", data)
       setMonthlyHabits(data.habits || []);
     } catch (error) {   
       console.error("Erreur détaillée:", error);

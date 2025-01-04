@@ -35,6 +35,7 @@ export async function GET() {
       59
     );
 
+    // On récupère les tâches du mois en cours
     const habits = await prisma.habit.findMany({
       where: {
         userId: user.id,
@@ -51,47 +52,20 @@ export async function GET() {
       },
     });
 
+    // Nombre de jours dans le mois
     const daysInMonth = lastDayOfMonth.getDate();
-    const formattedHabits = habits.map((habit) => {
-      const completionMap = new Map(
-        habit.HabitLog.filter((habitLog) => habitLog.date instanceof Date).map(
-          (habitLog) => [
-            habitLog.date.toISOString().split("T")[0],
-            habitLog.completed,
-          ]
-        )
-      );
 
-      console.log(habits);
-
-      const dailyStatus = Array.from({ length: daysInMonth }, (_, index) => {
-        const currentDate = new Date(
-          now.getFullYear(),
-          now.getMonth(),
-          index + 1
-        );
-        if (isNaN(currentDate.getTime())) {
-          return {
-            date: "",
-            day: index + 1,
-            completed: false,
-          };
-        }
-
-        const dateStr = currentDate.toISOString().split("T")[0];
-        return {
-          date: dateStr,
-          day: index + 1,
-          completed: completionMap.get(dateStr) ?? false,
-        };
-      });
-
-      return {
+      // On formate les données
+    const formattedHabits = habits.flatMap((habit) => {
+      return habit.HabitLog.map((habitLog) => ({
         id: habit.id,
         title: habit.name,
         description: habit.description,
-        dailyStatus,
-      };
+        status: habitLog.status,
+        date: habitLog.date.toISOString().split("T")[0],
+        day: new Date(habitLog.date).getDate(),
+        completed: habitLog.completed,
+      }));
     });
 
     return NextResponse.json({
