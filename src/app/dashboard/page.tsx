@@ -8,6 +8,7 @@ import TaskCard from "../components/TaskCard";
 import Loader from "../components/Loader";
 import Celebration from "../components/Celebration";
 import MonthlyProgress from "../components/MonthlyProgress";
+import { MonthlyResponseData } from "../interfaces/monthData.interface";
 
 function calculateTimeRemaining(): string {
   const now = new Date();
@@ -52,16 +53,8 @@ export default function DashboardPage() {
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [showCelebration, setShowCelebration] = useState(false);
   const [isLoadingStatus, setIsLoadingStatus] = useState(false);
-  const [monthlyHabits, setMonthlyHabits] = useState<Array<{
-    id: string;
-    title: string;
-    description: string | null;
-    dailyStatus: Array<{
-      date: string;
-      day: number;
-      completed: boolean;
-    }>;
-  }>>([]);
+
+  const [monthlyData, setMonthlyData] = useState<MonthlyResponseData | null>(null);
 
   useEffect(() => {
     // Mettre à jour le temps restant seulement si la tâche n'est pas complétée
@@ -161,11 +154,12 @@ export default function DashboardPage() {
         throw new Error(errorData.error || "Erreur lors du chargement des habitudes du mois en cours");
       }
       const data = await response.json();
-      setMonthlyHabits(data.habits || []);
+      setMonthlyData(data || null);
+      console.log(data)
     } catch (error) {   
       console.error("Erreur détaillée:", error);
       // Initialiser avec un tableau vide en cas d'erreur
-      setMonthlyHabits([]);
+      setMonthlyData(null);
     } finally {
       setIsLoading(false);
     }
@@ -340,8 +334,17 @@ export default function DashboardPage() {
           animate={{ opacity: 1, x: 0 }}
           className="h-full"
         >
-          <div className="h-full">
-            <MonthlyProgress habits={monthlyHabits} />
+            <div className="h-full">
+            {monthlyData ? (
+              <MonthlyProgress
+                month={monthlyData.month}
+                year={monthlyData.year}
+                daysInMonth={monthlyData.daysInMonth}
+                habits={monthlyData.habits}
+              />
+            ) : (
+              <div>Aucune donnée à afficher</div>
+            )}
           </div>
         </motion.div>
       </div>
