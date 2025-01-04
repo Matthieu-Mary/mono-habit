@@ -155,7 +155,6 @@ export default function DashboardPage() {
       }
       const data = await response.json();
       setMonthlyData(data || null);
-      console.log(data)
     } catch (error) {   
       console.error("Erreur détaillée:", error);
       // Initialiser avec un tableau vide en cas d'erreur

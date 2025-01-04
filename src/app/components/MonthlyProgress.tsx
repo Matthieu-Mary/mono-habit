@@ -3,27 +3,19 @@
 import { motion } from "framer-motion";
 import { useMemo } from "react";
 import { Status } from "@prisma/client";
-
-// Tu peux ajuster selon ton chemin/nom d'interface :
 import { MonthlyResponseData } from "../interfaces/monthData.interface";
 
 /**
- * On suppose que l'interface MonthlyResponseData ressemble à :
- *
- * export interface MonthlyResponseData {
- *   month: number;         // ex: 1 (janvier)
- *   year: number;          // ex: 2025
- *   daysInMonth: number;   // ex: 31
- *   habits: Array<{
- *     id: string;
- *     title: string;
- *     description: string | null;
- *     status: Status;      // "UNSCHEDULED" | "PENDING" | "COMPLETED" | "MISSED"
- *     date: string;        // "2025-01-04"
- *     day: number;         // 4
- *   }>;
- * }
+ * Petit utilitaire pour formater une date JS locale au format "YYYY-MM-DD"
+ * sans utiliser toISOString() (qui, elle, renvoie en UTC).
  */
+function toLocalDateString(date: Date): string {
+  const yyyy = date.getFullYear();
+  // getMonth() renvoie 0..11, on ajoute 1 avant de formatter
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
 
 export default function MonthlyProgress({
   month,
@@ -37,7 +29,7 @@ export default function MonthlyProgress({
   // Date "maintenant" pour savoir si un jour est passé, en cours ou futur
   const now = new Date();
 
-  // Nom du mois (en français)
+  // Nom du mois (en français) pour l'entête
   const currentMonthName = new Date(year, serverMonthIndex).toLocaleString(
     "fr-FR",
     { month: "long" }
@@ -62,23 +54,23 @@ export default function MonthlyProgress({
 
   /**
    * On génère tous les jours du mois (1..daysInMonth).
-   * Pour chaque jour, on détermine son status final (sans regarder le champ "completed" !)
+   * Pour chaque jour, on détermine son status final.
+   * On n'utilise pas toISOString(), on fabrique "YYYY-MM-DD" en local.
    */
   const daysArray = useMemo(() => {
     const tmp = [];
 
     for (let d = 1; d <= daysInMonth; d++) {
       const currentDate = new Date(year, serverMonthIndex, d);
-      const dateString = currentDate.toISOString().split("T")[0];
+      const dateString = toLocalDateString(currentDate);
 
-      // Valeur par défaut
       let dayStatus: Status = "UNSCHEDULED";
 
       // Si le jour est aujourd'hui ou dans le passé, on vérifie s'il y a un log
       if (currentDate <= now && statusMap.has(dateString)) {
         dayStatus = statusMap.get(dateString)!;
       }
-      // Sinon on garde "UNSCHEDULED", ce qui indique "gris foncé" (pour du futur ou pas de log)
+      // Sinon on garde "UNSCHEDULED" (futur ou pas de log)
 
       tmp.push({ date: currentDate, status: dayStatus });
     }
@@ -95,20 +87,20 @@ export default function MonthlyProgress({
       case "COMPLETED":
         return "bg-emerald-500 hover:bg-emerald-600";
       case "PENDING":
-        return "bg-gray-300 hover:bg-gray-400"; // gris clair
+        return "bg-blue-300 hover:bg-blue-400"; // bleu clair pour "en cours"
       case "UNSCHEDULED":
       default:
-        return "bg-gray-600 hover:bg-gray-700"; // gris foncé
+        return "bg-gray-500 hover:bg-gray-600"; // gris foncé
     }
   };
 
   /**
-   * Décalage (offset) pour aligner le 1er jour sur la bonne colonne (lundi = col 1)
+   * Décalage (offset) pour aligner le 1er jour du mois sur la bonne colonne (lundi = col 1)
    */
   let offset = 0;
   if (daysArray.length > 0) {
     const firstDay = daysArray[0].date;
-    // getDay() renvoie : 0 (dim), 1 (lun), 2 (mar)...
+    // getDay() renvoie : 0(dim), 1(lun), 2(mar)...
     offset = (firstDay.getDay() + 6) % 7;
   }
 
@@ -131,7 +123,6 @@ export default function MonthlyProgress({
   return (
     <div className="bg-white rounded-2xl p-6 shadow-lg h-full">
       <h2 className="text-xl font-semibold text-sage-800 mb-4 capitalize">
-        {/* ex: "janvier 2025" */}
         {currentMonthName} {year}
       </h2>
 
