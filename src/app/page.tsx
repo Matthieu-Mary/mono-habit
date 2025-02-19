@@ -2,14 +2,12 @@
 import { useRouter } from "next/navigation";
 
 export default function Home() {
-  
   //add redirection to signup page when clicking on the button Commencer votre voyage
   const handleStartJourney = () => {
-    router.push('/auth/login');
+    router.push("/auth/login");
   };
-  
+
   const router = useRouter();
-  
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-sage-50 to-sage-100 flex flex-col items-center justify-center p-8">
@@ -17,9 +15,10 @@ export default function Home() {
         <h1 className="text-4xl md:text-6xl font-bold text-sage-800 mb-4">
           Mono<span className="text-emerald-600">Habit</span>
         </h1>
-        
+
         <p className="text-xl text-sage-700 leading-relaxed">
-          Concentrez-vous sur une seule habitude à la fois. 
+          Concentrez-vous sur une seule habitude à la fois.
+          <br />
           Transformez votre vie, un petit pas après l&apos;autre.
         </p>
 
@@ -37,7 +36,7 @@ export default function Home() {
           </div>
         </div>
 
-        <button 
+        <button
           onClick={handleStartJourney}
           className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-8 rounded-full transition-all transform hover:scale-105"
         >
