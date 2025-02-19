@@ -9,6 +9,7 @@ import Loader from "../components/Loader";
 import Celebration from "../components/Celebration";
 import MonthlyProgress from "../components/MonthlyProgress";
 import { MonthlyResponseData } from "../interfaces/monthData.interface";
+import StatsCard from "../components/StatsCard";
 
 function calculateTimeRemaining(): string {
   const now = new Date();
@@ -54,7 +55,9 @@ export default function DashboardPage() {
   const [showCelebration, setShowCelebration] = useState(false);
   const [isLoadingStatus, setIsLoadingStatus] = useState(false);
 
-  const [monthlyData, setMonthlyData] = useState<MonthlyResponseData | null>(null);
+  const [monthlyData, setMonthlyData] = useState<MonthlyResponseData | null>(
+    null
+  );
 
   useEffect(() => {
     // Mettre à jour le temps restant seulement si la tâche n'est pas complétée
@@ -151,11 +154,14 @@ export default function DashboardPage() {
       const response = await fetch("/api/habits/monthly");
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Erreur lors du chargement des habitudes du mois en cours");
+        throw new Error(
+          errorData.error ||
+            "Erreur lors du chargement des habitudes du mois en cours"
+        );
       }
       const data = await response.json();
       setMonthlyData(data || null);
-    } catch (error) {   
+    } catch (error) {
       console.error("Erreur détaillée:", error);
       // Initialiser avec un tableau vide en cas d'erreur
       setMonthlyData(null);
@@ -303,28 +309,8 @@ export default function DashboardPage() {
             )}
           </motion.div>
 
-          {/* Bloc infos */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="bg-white rounded-2xl p-8 shadow-lg relative"
-          >
-            <h2 className="text-2xl font-semibold text-sage-800 mb-6">Infos</h2>
-            <div className="space-y-3 h-full flex flex-col">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="bg-sage-50 py-3 px-5 rounded-xl text-center sm:text-left">
-                  <h3 className="text-sm text-sage-600">Taux de réussite</h3>
-                  <p className="text-2xl font-bold text-emerald-600">87%</p>
-                  <p className="text-xs text-sage-500">Ce mois-ci</p>
-                </div>
-                <div className="bg-sage-50 py-3 px-5 rounded-xl text-center sm:text-left">
-                  <h3 className="text-sm text-sage-600">Série actuelle</h3>
-                  <p className="text-2xl font-bold text-emerald-600">5 jours</p>
-                  <p className="text-xs text-sage-500">Record : 12 jours</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+          {/* Remplacer le bloc infos par le nouveau composant */}
+          <StatsCard />
         </div>
 
         {/* Historique des habitudes */}
@@ -333,7 +319,7 @@ export default function DashboardPage() {
           animate={{ opacity: 1, x: 0 }}
           className="h-full"
         >
-            <div className="h-full">
+          <div className="h-full">
             {monthlyData ? (
               <MonthlyProgress
                 month={monthlyData.month}
