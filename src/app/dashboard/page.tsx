@@ -54,6 +54,7 @@ export default function DashboardPage() {
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [showCelebration, setShowCelebration] = useState(false);
   const [isLoadingStatus, setIsLoadingStatus] = useState(false);
+  const [isMonthlyProgressLoading, setIsMonthlyProgressLoading] = useState(false);
 
   const [monthlyData, setMonthlyData] = useState<MonthlyResponseData | null>(
     null
@@ -128,6 +129,8 @@ export default function DashboardPage() {
 
     setIsLoading(true);
     setIsLoadingStatus(true);
+    setIsMonthlyProgressLoading(true);
+
     try {
       const response = await fetch(`/api/habits/${currentTask.id}/complete`, {
         method: "POST",
@@ -140,11 +143,13 @@ export default function DashboardPage() {
       setIsCompleted(true);
       setShowCelebration(true);
       await fetchTodayTask();
+      await fetchMonthlyHabits();
     } catch (error) {
       console.error("Erreur:", error);
     } finally {
       setIsLoading(false);
       setIsLoadingStatus(false);
+      setIsMonthlyProgressLoading(false);
     }
   };
 
@@ -320,7 +325,14 @@ export default function DashboardPage() {
           className="h-full"
         >
           <div className="h-full">
-            {monthlyData ? (
+            {isMonthlyProgressLoading ? (
+              <div className="bg-white rounded-2xl p-6 shadow-lg h-full flex items-center justify-center">
+                <div className="text-center">
+                  <Loader size="lg" />
+                  <p className="mt-4 text-sage-600">Mise à jour du calendrier...</p>
+                </div>
+              </div>
+            ) : monthlyData ? (
               <MonthlyProgress
                 month={monthlyData.month}
                 year={monthlyData.year}
