@@ -1,9 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Status } from "@prisma/client";
 import { MonthlyResponseData } from "../interfaces/monthData.interface";
+import TaskDetailsModal from "./TaskDetailsModal";
 
 /**
  * Petit utilitaire pour formater une date JS locale au format "YYYY-MM-DD"
@@ -17,12 +18,22 @@ function toLocalDateString(date: Date): string {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+interface TaskDetails {
+  title: string;
+  description?: string;
+  status: Status;
+  date: string;
+}
+
 export default function MonthlyProgress({
   month,
   year,
   daysInMonth,
   habits,
 }: MonthlyResponseData) {
+  const [selectedTask, setSelectedTask] = useState<TaskDetails | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   // Convertit le mois renvoyé par l'API (1..12) en index JS (0..11)
   const serverMonthIndex = month - 1;
 
@@ -87,10 +98,10 @@ export default function MonthlyProgress({
       case "COMPLETED":
         return "bg-emerald-500 hover:bg-emerald-600";
       case "PENDING":
-        return "bg-blue-300 hover:bg-blue-400"; // bleu clair pour "en cours"
+        return "bg-blue-300 hover:bg-blue-400"; // Pour les tâches programmées
       case "UNSCHEDULED":
       default:
-        return "bg-gray-500 hover:bg-gray-600"; // gris foncé
+        return "bg-gray-500 hover:bg-gray-600";
     }
   };
 
@@ -114,10 +125,36 @@ export default function MonthlyProgress({
       case "MISSED":
         return "Tâche manquée";
       case "PENDING":
-        return "Tâche en cours";
+        return "Programmé";
       default:
         return "Aucune tâche";
     }
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleDayClick = (date: Date, status: Status) => {
+    const dateStr = toLocalDateString(date);
+    const habitForDay = habits.find(h => h.date === dateStr);
+    
+    if (date > new Date()) {
+      // Jour futur : ouvrir modale de programmation
+      setSelectedTask({
+        title: "",
+        description: "",
+        status: "UNSCHEDULED",
+        date: dateStr
+      });
+    } else if (habitForDay) {
+      // Jour passé ou présent avec une tâche : afficher les détails
+      setSelectedTask({
+        title: habitForDay.title,
+        description: habitForDay.description || "",
+        status: habitForDay.status,
+        date: dateStr
+      });
+    }
+    
+    setIsModalOpen(true);
   };
 
   return (
@@ -157,6 +194,7 @@ export default function MonthlyProgress({
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: index * 0.01 }}
+            onClick={() => handleDayClick(day.date, day.status)}
             className={`
               relative aspect-square rounded-lg cursor-pointer
               transition-all duration-200 ease-in-out
@@ -198,13 +236,24 @@ export default function MonthlyProgress({
         </div>
         <div className="flex items-center gap-1">
           <div className={`w-3 h-3 rounded ${getStatusColor("PENDING")}`} />
-          <span className="text-sage-600">En cours</span>
+          <span className="text-sage-600">Programmé</span>
         </div>
         <div className="flex items-center gap-1">
           <div className={`w-3 h-3 rounded ${getStatusColor("UNSCHEDULED")}`} />
           <span className="text-sage-600">Non programmé</span>
         </div>
       </div>
+
+      {/* Modale de détails/programmation */}
+      <TaskDetailsModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedTask(null);
+        }}
+        task={selectedTask}
+        isFutureDate={selectedTask ? new Date(selectedTask.date) > new Date() : false}
+      />
     </div>
   );
 }
