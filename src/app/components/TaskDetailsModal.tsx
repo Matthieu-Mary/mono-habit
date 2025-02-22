@@ -46,6 +46,16 @@ export default function TaskDetailsModal({
     }
   };
 
+  const getBackgroundColor = (status?: Status) => {
+    const colorMap = {
+      COMPLETED: "bg-emerald-100",
+      MISSED: "bg-red-100",
+      PENDING: "bg-sky-100",
+      NOT_SCHEDULED: "bg-gray-100",
+    };
+    return colorMap[status as keyof typeof colorMap] || "bg-gray-100";
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -63,7 +73,11 @@ export default function TaskDetailsModal({
             className="bg-white rounded-3xl p-8 shadow-xl max-w-md w-full mx-4 relative text-sage-800"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="absolute -top-2 -left-2 w-full h-full bg-emerald-100 rounded-3xl -z-10 transform rotate-1"></div>
+            <div
+              className={`absolute -top-2 -left-2 w-full h-full ${getBackgroundColor(
+                task?.status
+              )} rounded-3xl -z-10 transform rotate-1`}
+            ></div>
 
             <h2 className="text-2xl font-bold text-sage-800 mb-6">
               {isFutureDate ? "Programmer une tâche" : "Détails de la tâche"}
@@ -90,7 +104,10 @@ export default function TaskDetailsModal({
                 </div>
 
                 <div>
-                  <label className="block text-sage-700 mb-2" htmlFor="description">
+                  <label
+                    className="block text-sage-700 mb-2"
+                    htmlFor="description"
+                  >
                     Description (optionnelle)
                   </label>
                   <motion.textarea
@@ -134,7 +151,14 @@ export default function TaskDetailsModal({
                 </div>
                 <div className="pt-4 border-t border-sage-200">
                   <span className="text-sm text-sage-500">
-                    Status: {task?.status === "COMPLETED" ? "Complétée" : task?.status === "MISSED" ? "Manquée" : "Programmée"}
+                    Status:{" "}
+                    {task?.status === "COMPLETED"
+                      ? "Complétée"
+                      : task?.status === "MISSED"
+                      ? "Manquée"
+                      : task?.status === "PENDING"
+                      ? "Programmée"
+                      : "Non programmée"}
                   </span>
                 </div>
                 <motion.button
@@ -152,4 +176,4 @@ export default function TaskDetailsModal({
       )}
     </AnimatePresence>
   );
-} 
+}
