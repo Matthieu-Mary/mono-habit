@@ -15,6 +15,8 @@ export default function TaskModal({
   onSuccess,
 }: Readonly<TaskModalProps>) {
   const [formData, setFormData] = useState({ title: "", description: "" });
+
+  // eslint-disable-next-line
   const [isLoading, setIsLoading] = useState(false);
 
   // Animation des particules en arrière-plan

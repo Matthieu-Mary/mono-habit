@@ -26,6 +26,7 @@ export default function TaskDetailsModal({
     description: task?.description ?? "",
   });
 
+  // eslint-disable-next-line
   const [isLoading, setIsLoading] = useState(false);
 
   const handleScheduleTask = async () => {

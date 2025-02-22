@@ -54,7 +54,8 @@ export default function DashboardPage() {
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [showCelebration, setShowCelebration] = useState(false);
   const [isLoadingStatus, setIsLoadingStatus] = useState(false);
-  const [isMonthlyProgressLoading, setIsMonthlyProgressLoading] = useState(false);
+  const [isMonthlyProgressLoading, setIsMonthlyProgressLoading] =
+    useState(false);
 
   const [monthlyData, setMonthlyData] = useState<MonthlyResponseData | null>(
     null
@@ -165,6 +166,7 @@ export default function DashboardPage() {
         );
       }
       const data = await response.json();
+      console.log("Data du mois : ", data);
       setMonthlyData(data || null);
     } catch (error) {
       console.error("Erreur détaillée:", error);
@@ -177,6 +179,15 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchMonthlyHabits();
+  }, [fetchMonthlyHabits]);
+
+  const handleMonthlySuccess = useCallback(async () => {
+    setIsMonthlyProgressLoading(true);
+    try {
+      await fetchMonthlyHabits();
+    } finally {
+      setIsMonthlyProgressLoading(false);
+    }
   }, [fetchMonthlyHabits]);
 
   if (status === "loading") {
@@ -329,7 +340,9 @@ export default function DashboardPage() {
               <div className="bg-white rounded-2xl p-6 shadow-lg h-full flex items-center justify-center">
                 <div className="text-center">
                   <Loader size="lg" />
-                  <p className="mt-4 text-sage-600">Mise à jour du calendrier...</p>
+                  <p className="mt-4 text-sage-600">
+                    Mise à jour du calendrier...
+                  </p>
                 </div>
               </div>
             ) : monthlyData ? (
@@ -338,6 +351,7 @@ export default function DashboardPage() {
                 year={monthlyData.year}
                 daysInMonth={monthlyData.daysInMonth}
                 habits={monthlyData.habits}
+                onSuccess={handleMonthlySuccess}
               />
             ) : (
               <div>Aucune donnée à afficher</div>

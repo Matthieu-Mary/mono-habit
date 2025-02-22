@@ -25,12 +25,17 @@ interface TaskDetails {
   date: string;
 }
 
+interface MonthlyProgressProps extends MonthlyResponseData {
+  onSuccess?: () => Promise<void>;
+}
+
 export default function MonthlyProgress({
   month,
   year,
   daysInMonth,
   habits,
-}: Readonly<MonthlyResponseData>) {
+  onSuccess,
+}: Readonly<MonthlyProgressProps>) {
   const [selectedTask, setSelectedTask] = useState<TaskDetails | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -77,16 +82,16 @@ export default function MonthlyProgress({
 
       let dayStatus: Status = "UNSCHEDULED";
 
-      // Si le jour est aujourd'hui ou dans le passé, on vérifie s'il y a un log
-      if (currentDate <= now && statusMap.has(dateString)) {
+      // On vérifie s'il y a un log pour cette date, peu importe si c'est dans le futur
+      if (statusMap.has(dateString)) {
         dayStatus = statusMap.get(dateString)!;
       }
-      // Sinon on garde "UNSCHEDULED" (futur ou pas de log)
+      // On ne fait plus la vérification de la date car on veut aussi afficher les tâches programmées
 
       tmp.push({ date: currentDate, status: dayStatus });
     }
     return tmp;
-  }, [daysInMonth, year, serverMonthIndex, now, statusMap]);
+  }, [daysInMonth, year, serverMonthIndex, statusMap]);
 
   /**
    * Choix de la couleur selon status
@@ -148,13 +153,25 @@ export default function MonthlyProgress({
       // Jour passé ou présent avec une tâche : afficher les détails
       setSelectedTask({
         title: habitForDay.title,
-        description: habitForDay.description || "",
+        description: habitForDay.description ?? "",
         status: habitForDay.status,
         date: dateStr,
       });
     }
 
     setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedTask(null);
+  };
+
+  const handleTaskSuccess = async () => {
+    if (onSuccess) {
+      await onSuccess();
+    }
+    handleModalClose();
   };
 
   return (
@@ -247,10 +264,8 @@ export default function MonthlyProgress({
       {/* Modale de détails/programmation */}
       <TaskDetailsModal
         isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedTask(null);
-        }}
+        onClose={handleModalClose}
+        onSuccess={handleTaskSuccess}
         task={selectedTask}
         isFutureDate={
           selectedTask ? new Date(selectedTask.date) > new Date() : false
