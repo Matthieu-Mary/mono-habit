@@ -30,7 +30,7 @@ export default function MonthlyProgress({
   year,
   daysInMonth,
   habits,
-}: MonthlyResponseData) {
+}: Readonly<MonthlyResponseData>) {
   const [selectedTask, setSelectedTask] = useState<TaskDetails | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -134,15 +134,15 @@ export default function MonthlyProgress({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDayClick = (date: Date, status: Status) => {
     const dateStr = toLocalDateString(date);
-    const habitForDay = habits.find(h => h.date === dateStr);
-    
+    const habitForDay = habits.find((h) => h.date === dateStr);
+
     if (date > new Date()) {
       // Jour futur : ouvrir modale de programmation
       setSelectedTask({
         title: "",
         description: "",
         status: "UNSCHEDULED",
-        date: dateStr
+        date: dateStr,
       });
     } else if (habitForDay) {
       // Jour passé ou présent avec une tâche : afficher les détails
@@ -150,10 +150,10 @@ export default function MonthlyProgress({
         title: habitForDay.title,
         description: habitForDay.description || "",
         status: habitForDay.status,
-        date: dateStr
+        date: dateStr,
       });
     }
-    
+
     setIsModalOpen(true);
   };
 
@@ -252,7 +252,9 @@ export default function MonthlyProgress({
           setSelectedTask(null);
         }}
         task={selectedTask}
-        isFutureDate={selectedTask ? new Date(selectedTask.date) > new Date() : false}
+        isFutureDate={
+          selectedTask ? new Date(selectedTask.date) > new Date() : false
+        }
       />
     </div>
   );

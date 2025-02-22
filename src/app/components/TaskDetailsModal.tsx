@@ -2,10 +2,9 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { Status } from "@prisma/client";
+import { TaskModalProps } from "./TaskModal";
 
-interface TaskDetailsModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+interface TaskDetailsModalProps extends TaskModalProps {
   task: {
     title: string;
     description?: string;
@@ -18,16 +17,21 @@ interface TaskDetailsModalProps {
 export default function TaskDetailsModal({
   isOpen,
   onClose,
+  onSuccess,
   task,
   isFutureDate,
-}: TaskDetailsModalProps) {
+}: Readonly<TaskDetailsModalProps>) {
   const [formData, setFormData] = useState({
-    title: task?.title || "",
-    description: task?.description || "",
+    title: task?.title ?? "",
+    description: task?.description ?? "",
   });
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleScheduleTask = async () => {
     try {
+      setIsLoading(true);
+
       const response = await fetch("/api/habits", {
         method: "POST",
         headers: {
@@ -39,13 +43,21 @@ export default function TaskDetailsModal({
         }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la programmation");
+      setFormData({ title: "", description: "" });
+
+      if (!response.ok)
+        throw new Error("Erreur lors de la programmation de la tâche");
+
+      onSuccess();
       onClose();
     } catch (error) {
       console.error("Erreur:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  // Fonction pour obtenir la couleur de fond en fonction du statut
   const getBackgroundColor = (status?: Status) => {
     const colorMap = {
       COMPLETED: "bg-emerald-100",

@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
-interface TaskModalProps {
+export interface TaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
@@ -13,7 +13,7 @@ export default function TaskModal({
   isOpen,
   onClose,
   onSuccess,
-}: TaskModalProps) {
+}: Readonly<TaskModalProps>) {
   const [formData, setFormData] = useState({ title: "", description: "" });
   const [isLoading, setIsLoading] = useState(false);
 
