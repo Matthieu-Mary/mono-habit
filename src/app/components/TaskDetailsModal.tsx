@@ -6,6 +6,7 @@ import { TaskModalProps } from "./TaskModal";
 
 interface TaskDetailsModalProps extends TaskModalProps {
   task: {
+    id?: string;
     title: string;
     description?: string;
     status: Status;
@@ -19,7 +20,6 @@ export default function TaskDetailsModal({
   onClose,
   onSuccess,
   task,
-  isFutureDate,
 }: Readonly<TaskDetailsModalProps>) {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
