@@ -1,6 +1,6 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Status } from "@prisma/client";
 import { TaskModalProps } from "./TaskModal";
 
@@ -21,20 +21,35 @@ export default function TaskDetailsModal({
   task,
   isFutureDate,
 }: Readonly<TaskDetailsModalProps>) {
+  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     title: task?.title ?? "",
     description: task?.description ?? "",
   });
 
-  // eslint-disable-next-line
   const [isLoading, setIsLoading] = useState(false);
+
+  // Mettre à jour formData quand task change
+  useEffect(() => {
+    setFormData({
+      title: task?.title ?? "",
+      description: task?.description ?? "",
+    });
+  }, [task]);
 
   const handleScheduleTask = async () => {
     try {
       setIsLoading(true);
 
-      const response = await fetch("/api/habits", {
-        method: "POST",
+      // Si on est en mode édition, on fait un PATCH
+      // Sinon, on crée une nouvelle tâche avec POST
+      const method = isEditing ? "PATCH" : "POST";
+      const endpoint = isEditing
+        ? `/api/habits/${task?.id}` // Il faudra ajouter l'ID dans l'interface TaskDetails
+        : "/api/habits";
+
+      const response = await fetch(endpoint, {
+        method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -44,12 +59,18 @@ export default function TaskDetailsModal({
         }),
       });
 
-      setFormData({ title: "", description: "" });
+      if (!response.ok) {
+        throw new Error(
+          isEditing
+            ? "Erreur lors de la modification de la tâche"
+            : "Erreur lors de la programmation de la tâche"
+        );
+      }
 
-      if (!response.ok)
-        throw new Error("Erreur lors de la programmation de la tâche");
+      if (onSuccess) {
+        await onSuccess();
+      }
 
-      onSuccess();
       onClose();
     } catch (error) {
       console.error("Erreur:", error);
@@ -57,6 +78,9 @@ export default function TaskDetailsModal({
       setIsLoading(false);
     }
   };
+
+  // Détermine si on peut éditer la tâche (uniquement si PENDING)
+  const canEdit = task?.status === "PENDING";
 
   // Fonction pour obtenir la couleur de fond en fonction du statut
   const getBackgroundColor = (status?: Status) => {
@@ -93,10 +117,14 @@ export default function TaskDetailsModal({
             ></div>
 
             <h2 className="text-2xl font-bold text-sage-800 mb-6">
-              {isFutureDate ? "Programmer une tâche" : "Détails de la tâche"}
+              {!task?.title
+                ? "Programmer une tâche"
+                : isEditing
+                ? "Modifier la tâche"
+                : "Détails de la tâche"}
             </h2>
 
-            {isFutureDate ? (
+            {!task?.title || isEditing ? (
               <div className="space-y-6">
                 <div>
                   <label className="block text-sage-700 mb-2" htmlFor="title">
@@ -142,12 +170,22 @@ export default function TaskDetailsModal({
                     onClick={handleScheduleTask}
                     className="flex-1 bg-emerald-500 text-white py-3 rounded-xl hover:bg-emerald-600 transition-colors"
                   >
-                    Programmer
+                    {isEditing ? "Modifier" : "Programmer"}
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={onClose}
+                    onClick={() => {
+                      if (isEditing) {
+                        setIsEditing(false);
+                        setFormData({
+                          title: task?.title ?? "",
+                          description: task?.description ?? "",
+                        });
+                      } else {
+                        onClose();
+                      }
+                    }}
                     className="flex-1 bg-sage-100 text-sage-700 py-3 rounded-xl hover:bg-sage-200 transition-colors"
                   >
                     Annuler
@@ -157,31 +195,43 @@ export default function TaskDetailsModal({
             ) : (
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-sage-700">{task?.title}</h3>
-                  {task?.description && (
+                  <h3 className="font-semibold text-sage-700">{task.title}</h3>
+                  {task.description && (
                     <p className="mt-2 text-sage-600">{task.description}</p>
                   )}
                 </div>
                 <div className="pt-4 border-t border-sage-200">
                   <span className="text-sm text-sage-500">
                     Status:{" "}
-                    {task?.status === "COMPLETED"
+                    {task.status === "COMPLETED"
                       ? "Complétée"
-                      : task?.status === "MISSED"
+                      : task.status === "MISSED"
                       ? "Manquée"
-                      : task?.status === "PENDING"
+                      : task.status === "PENDING"
                       ? "Programmée"
                       : "Non programmée"}
                   </span>
                 </div>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={onClose}
-                  className="w-full bg-sage-100 text-sage-700 py-3 rounded-xl hover:bg-sage-200 transition-colors mt-4"
-                >
-                  Fermer
-                </motion.button>
+                <div className="flex gap-4">
+                  {canEdit && (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setIsEditing(true)}
+                      className="flex-1 bg-emerald-500 text-white py-3 rounded-xl hover:bg-emerald-600 transition-colors"
+                    >
+                      Modifier
+                    </motion.button>
+                  )}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={onClose}
+                    className="flex-1 bg-sage-100 text-sage-700 py-3 rounded-xl hover:bg-sage-200 transition-colors"
+                  >
+                    Fermer
+                  </motion.button>
+                </div>
               </div>
             )}
           </motion.div>

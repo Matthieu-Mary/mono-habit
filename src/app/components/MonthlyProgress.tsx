@@ -19,6 +19,7 @@ function toLocalDateString(date: Date): string {
 }
 
 interface TaskDetails {
+  id?: string;
   title: string;
   description?: string;
   status: Status;
@@ -141,20 +142,21 @@ export default function MonthlyProgress({
     const dateStr = toLocalDateString(date);
     const habitForDay = habits.find((h) => h.date === dateStr);
 
-    if (date > new Date()) {
-      // Jour futur : ouvrir modale de programmation
+    if (habitForDay) {
+      // Si une tâche existe déjà pour ce jour (COMPLETED, MISSED ou PENDING)
+      setSelectedTask({
+        id: habitForDay.id,
+        title: habitForDay.title,
+        description: habitForDay.description ?? "",
+        status: habitForDay.status,
+        date: dateStr,
+      });
+    } else if (date > now) {
+      // Jour futur sans tâche : ouvrir modale de programmation
       setSelectedTask({
         title: "",
         description: "",
         status: "UNSCHEDULED",
-        date: dateStr,
-      });
-    } else if (habitForDay) {
-      // Jour passé ou présent avec une tâche : afficher les détails
-      setSelectedTask({
-        title: habitForDay.title,
-        description: habitForDay.description ?? "",
-        status: habitForDay.status,
         date: dateStr,
       });
     }
@@ -268,7 +270,7 @@ export default function MonthlyProgress({
         onSuccess={handleTaskSuccess}
         task={selectedTask}
         isFutureDate={
-          selectedTask ? new Date(selectedTask.date) > new Date() : false
+          selectedTask ? new Date(selectedTask.date) > now : false
         }
       />
     </div>
