@@ -120,7 +120,7 @@ export default function Historic() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className={`bg-white rounded-2xl p-6 shadow-lg relative overflow-hidden min-h-[200px]
+              className={`bg-white rounded-2xl p-6 shadow-lg relative overflow-hidden min-h-[245px]
                 ${
                   monthStats.isPerfect
                     ? "bg-gradient-to-br from-yellow-100 to-amber-100"
@@ -165,7 +165,7 @@ export default function Historic() {
                       {monthStats.bestStreak} jours
                     </span>
                   </div>
-                  <div className="pt-2 border-t border-sage-200">
+                  <div className="pt-2 border-sage-200 flex items-center justify-between">
                     <span className="text-sm text-sage-600 block mb-2">
                       Type de tâche favori
                     </span>
