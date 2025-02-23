@@ -11,6 +11,7 @@ interface TaskDetailsModalProps extends TaskModalProps {
     description?: string;
     status: Status;
     date: string;
+    type: string;
   } | null;
   isFutureDate: boolean;
 }
@@ -25,6 +26,7 @@ export default function TaskDetailsModal({
   const [formData, setFormData] = useState({
     title: task?.title ?? "",
     description: task?.description ?? "",
+    type: task?.type ?? "LOISIRS",
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -34,6 +36,7 @@ export default function TaskDetailsModal({
     setFormData({
       title: task?.title ?? "",
       description: task?.description ?? "",
+      type: task?.type ?? "LOISIRS",
     });
   }, [task]);
 
@@ -163,6 +166,25 @@ export default function TaskDetailsModal({
                   />
                 </div>
 
+                <div>
+                  <label className="block text-sage-700 mb-2" htmlFor="type">
+                    Type de tâche
+                  </label>
+                  <select
+                    id="type"
+                    value={formData.type}
+                    onChange={(e) =>
+                      setFormData({ ...formData, type: e.target.value })
+                    }
+                    className="w-full px-4 py-3 rounded-xl border border-sage-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
+                  >
+                    <option value="SANTE">Santé</option>
+                    <option value="SPORT">Sport</option>
+                    <option value="TRAVAIL">Travail</option>
+                    <option value="LOISIRS">Loisirs</option>
+                  </select>
+                </div>
+
                 <div className="flex gap-4 pt-4">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
@@ -181,6 +203,7 @@ export default function TaskDetailsModal({
                         setFormData({
                           title: task?.title ?? "",
                           description: task?.description ?? "",
+                          type: task?.type ?? "LOISIRS",
                         });
                       } else {
                         onClose();

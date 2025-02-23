@@ -38,6 +38,14 @@ model User {
   habitLogs     HabitLog[]
 }
 
+// Ajout de l'énumération pour les types de tâches
+enum TaskType {
+  SPORT
+  SANTE
+  TRAVAIL
+  LOISIRS
+}
+
 // Sert à enregistrer les habitudes (ex: manger une pomme, lire un livre, etc.)
 model Habit {
   id          String     @id @default(cuid())
@@ -49,6 +57,9 @@ model Habit {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   HabitLog    HabitLog[]
+  
+  // Ajout du type de tâche
+  type        TaskType   @default(LOISIRS) // Valeur par défaut
 }
 
 // Sert à enregistrer les logs des habitudes (ex: si on a mangé une pomme aujourd'hui, on enregistre le log)

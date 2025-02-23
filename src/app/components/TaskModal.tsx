@@ -14,7 +14,11 @@ export default function TaskModal({
   onClose,
   onSuccess,
 }: Readonly<TaskModalProps>) {
-  const [formData, setFormData] = useState({ title: "", description: "" });
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    type: "LOISIRS",
+  });
 
   // eslint-disable-next-line
   const [isLoading, setIsLoading] = useState(false);
@@ -54,7 +58,7 @@ export default function TaskModal({
 
       if (!response.ok) throw new Error("Erreur lors de la création");
 
-      setFormData({ title: "", description: "" });
+      setFormData({ title: "", description: "", type: "LOISIRS" });
       onSuccess();
       onClose();
     } catch (error) {
@@ -127,6 +131,25 @@ export default function TaskModal({
                   }
                   className="w-full px-4 py-3 rounded-xl border border-sage-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all resize-none h-32"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sage-700 mb-2" htmlFor="type">
+                  Type de tâche
+                </label>
+                <select
+                  id="type"
+                  value={formData.type}
+                  onChange={(e) =>
+                    setFormData({ ...formData, type: e.target.value })
+                  }
+                  className="w-full px-4 py-3 rounded-xl border border-sage-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
+                >
+                  <option value="SANTE">Santé</option>
+                  <option value="SPORT">Sport</option>
+                  <option value="TRAVAIL">Travail</option>
+                  <option value="LOISIRS">Loisirs</option>
+                </select>
               </div>
 
               <div className="flex gap-4 pt-4">
