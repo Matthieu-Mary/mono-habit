@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
-import { Status } from "@prisma/client";
+import { Status, TaskType } from "../types/enums";
 import { MonthlyResponseData } from "../interfaces/monthData.interface";
 import TaskDetailsModal from "./TaskDetailsModal";
 
@@ -24,6 +24,7 @@ interface TaskDetails {
   description?: string;
   status: Status;
   date: string;
+  type: TaskType;
 }
 
 interface MonthlyProgressProps extends MonthlyResponseData {
@@ -80,34 +81,42 @@ export default function MonthlyProgress({
     for (let d = 1; d <= daysInMonth; d++) {
       const currentDate = new Date(year, serverMonthIndex, d);
       const dateString = toLocalDateString(currentDate);
+      const isPastDay =
+        currentDate < now &&
+        toLocalDateString(currentDate) !== toLocalDateString(now);
 
-      let dayStatus: Status = "UNSCHEDULED";
+      // Par défaut, on considère que c'est un jour futur non programmé
+      let dayStatus = Status.FUTURE_UNSCHEDULED;
 
-      // On vérifie s'il y a un log pour cette date, peu importe si c'est dans le futur
+      // On vérifie s'il y a un log pour cette date
       if (statusMap.has(dateString)) {
         dayStatus = statusMap.get(dateString)!;
+      } else if (isPastDay) {
+        // Si c'est un jour passé sans tâche, on le marque comme non programmé dans le passé
+        dayStatus = Status.PAST_UNSCHEDULED;
       }
-      // On ne fait plus la vérification de la date car on veut aussi afficher les tâches programmées
 
       tmp.push({ date: currentDate, status: dayStatus });
     }
     return tmp;
-  }, [daysInMonth, year, serverMonthIndex, statusMap]);
+  }, [daysInMonth, year, serverMonthIndex, statusMap, now]);
 
   /**
    * Choix de la couleur selon status
    */
   const getStatusColor = (status: Status) => {
     switch (status) {
-      case "MISSED":
+      case Status.MISSED:
         return "bg-red-400 hover:bg-red-500";
-      case "COMPLETED":
+      case Status.COMPLETED:
         return "bg-emerald-500 hover:bg-emerald-600";
-      case "PENDING":
-        return "bg-blue-300 hover:bg-blue-400"; // Pour les tâches programmées
-      case "UNSCHEDULED":
+      case Status.PENDING:
+        return "bg-blue-300 hover:bg-blue-400";
+      case Status.PAST_UNSCHEDULED:
+        return "bg-gray-400 hover:bg-gray-500"; // Plus foncé pour les jours passés non programmés
+      case Status.FUTURE_UNSCHEDULED:
       default:
-        return "bg-gray-500 hover:bg-gray-600";
+        return "bg-gray-200 hover:bg-gray-300"; // Plus clair pour les jours futurs non programmés
     }
   };
 
@@ -126,42 +135,50 @@ export default function MonthlyProgress({
    */
   const getStatusLabel = (status: Status) => {
     switch (status) {
-      case "COMPLETED":
+      case Status.COMPLETED:
         return "Tâche complétée";
-      case "MISSED":
+      case Status.MISSED:
         return "Tâche manquée";
-      case "PENDING":
+      case Status.PENDING:
         return "Programmé";
+      case Status.PAST_UNSCHEDULED:
+        return "Jour passé non programmé";
+      case Status.FUTURE_UNSCHEDULED:
+        return "Jour disponible";
       default:
         return "Aucune tâche";
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleDayClick = (date: Date, status: Status) => {
+  const handleDayClick = (date: Date) => {
     const dateStr = toLocalDateString(date);
     const habitForDay = habits.find((h) => h.date === dateStr);
+    const isPastDay =
+      date < now && toLocalDateString(date) !== toLocalDateString(now);
 
     if (habitForDay) {
-      // Si une tâche existe déjà pour ce jour (COMPLETED, MISSED ou PENDING)
+      // Si une tâche existe déjà pour ce jour
       setSelectedTask({
         id: habitForDay.id,
         title: habitForDay.title,
         description: habitForDay.description ?? "",
         status: habitForDay.status,
         date: dateStr,
+        type: habitForDay.type ?? TaskType.LOISIRS,
       });
-    } else if (date > now) {
-      // Jour futur sans tâche : ouvrir modale de programmation
+      setIsModalOpen(true);
+    } else if (!isPastDay) {
+      // On ne permet l'ajout que pour aujourd'hui et les jours futurs
       setSelectedTask({
         title: "",
         description: "",
-        status: "UNSCHEDULED",
+        status: Status.FUTURE_UNSCHEDULED,
         date: dateStr,
+        type: TaskType.LOISIRS,
       });
+      setIsModalOpen(true);
     }
-
-    setIsModalOpen(true);
+    // On ne fait rien si c'est un jour passé sans tâche
   };
 
   const handleModalClose = () => {
@@ -213,7 +230,7 @@ export default function MonthlyProgress({
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: index * 0.01 }}
-            onClick={() => handleDayClick(day.date, day.status)}
+            onClick={() => handleDayClick(day.date)}
             className={`
               relative aspect-square rounded-lg cursor-pointer
               transition-all duration-200 ease-in-out
@@ -246,20 +263,36 @@ export default function MonthlyProgress({
       {/* Légende */}
       <div className="mt-4 flex flex-wrap gap-2 text-xs">
         <div className="flex items-center gap-1">
-          <div className={`w-3 h-3 rounded ${getStatusColor("COMPLETED")}`} />
+          <div
+            className={`w-3 h-3 rounded ${getStatusColor(Status.COMPLETED)}`}
+          />
           <span className="text-sage-600">Complétée</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className={`w-3 h-3 rounded ${getStatusColor("MISSED")}`} />
+          <div className={`w-3 h-3 rounded ${getStatusColor(Status.MISSED)}`} />
           <span className="text-sage-600">Manquée</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className={`w-3 h-3 rounded ${getStatusColor("PENDING")}`} />
+          <div
+            className={`w-3 h-3 rounded ${getStatusColor(Status.PENDING)}`}
+          />
           <span className="text-sage-600">Programmé</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className={`w-3 h-3 rounded ${getStatusColor("UNSCHEDULED")}`} />
-          <span className="text-sage-600">Non programmé</span>
+          <div
+            className={`w-3 h-3 rounded ${getStatusColor(
+              Status.PAST_UNSCHEDULED
+            )}`}
+          />
+          <span className="text-sage-600">Non programmé (passé)</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div
+            className={`w-3 h-3 rounded ${getStatusColor(
+              Status.FUTURE_UNSCHEDULED
+            )}`}
+          />
+          <span className="text-sage-600">Disponible</span>
         </div>
       </div>
 
@@ -269,9 +302,7 @@ export default function MonthlyProgress({
         onClose={handleModalClose}
         onSuccess={handleTaskSuccess}
         task={selectedTask}
-        isFutureDate={
-          selectedTask ? new Date(selectedTask.date) > now : false
-        }
+        isFutureDate={selectedTask ? new Date(selectedTask.date) > now : false}
       />
     </div>
   );

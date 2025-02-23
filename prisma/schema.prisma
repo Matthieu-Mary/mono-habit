@@ -17,7 +17,8 @@ datasource db {
 // ----------------- enums ----------------------
 
 enum Status {
-  UNSCHEDULED
+  FUTURE_UNSCHEDULED
+  PAST_UNSCHEDULED
   PENDING
   COMPLETED
   MISSED

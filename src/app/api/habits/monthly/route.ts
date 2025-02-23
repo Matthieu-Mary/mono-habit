@@ -65,6 +65,7 @@ export async function GET() {
         date: habitLog.date.toISOString().split("T")[0],
         day: new Date(habitLog.date).getDate(),
         completed: habitLog.completed,
+        type: habit.type,
       }));
     });
 

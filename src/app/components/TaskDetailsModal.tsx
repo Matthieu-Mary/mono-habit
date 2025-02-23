@@ -89,7 +89,9 @@ export default function TaskDetailsModal({
       [Status.COMPLETED]: "bg-emerald-100",
       [Status.MISSED]: "bg-red-100",
       [Status.PENDING]: "bg-sky-100",
-      [Status.UNSCHEDULED]: "bg-gray-100",
+      [Status.FUTURE_UNSCHEDULED]: "bg-gray-100",
+      [Status.PAST_UNSCHEDULED]: "bg-gray-100",
+
     };
     return colorMap[status as keyof typeof colorMap] || "bg-gray-100";
   };
