@@ -354,7 +354,9 @@ export default function DashboardPage() {
                 onSuccess={handleMonthlySuccess}
               />
             ) : (
-              <div>Aucune donnée à afficher</div>
+              <div className="flex items-center justify-center h-full bg-white">
+                <Loader size="lg" />
+              </div>
             )}
           </div>
         </motion.div>
