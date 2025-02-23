@@ -3,9 +3,14 @@
 import { signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isActive = (path: string) => pathname === path;
 
   return (
     <>
@@ -85,22 +90,32 @@ export default function Sidebar() {
           <nav className="flex-1">
             <ul className="space-y-3">
               <li>
-                <a
+                <Link
                   href="/dashboard"
-                  className="flex items-center space-x-3 p-3 rounded-xl bg-sage-50 hover:bg-sage-100 transition-colors"
+                  className={`flex items-center space-x-3 p-3 rounded-xl transition-colors
+                    ${
+                      isActive("/dashboard")
+                        ? "bg-emerald-100 text-emerald-700"
+                        : "bg-sage-50 hover:bg-sage-100 text-sage-800"
+                    }`}
                 >
                   <span className="p-2 bg-emerald-100 rounded-lg">🏠</span>
                   <span>Tableau de bord</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/dashboard/historic"
-                  className="flex items-center space-x-3 p-3 rounded-xl bg-sage-50 hover:bg-sage-100 transition-colors"
+                <Link
+                  href="/historic"
+                  className={`flex items-center space-x-3 p-3 rounded-xl transition-colors
+                    ${
+                      isActive("/historic")
+                        ? "bg-emerald-100 text-emerald-700"
+                        : "bg-sage-50 hover:bg-sage-100 text-sage-800"
+                    }`}
                 >
                   <span className="p-2 bg-emerald-100 rounded-lg">📅</span>
                   <span>Historique</span>
-                </a>
+                </Link>
               </li>
             </ul>
           </nav>
