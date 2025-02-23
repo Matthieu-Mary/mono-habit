@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Loader from "../components/Loader";
+import { TaskType } from "../types/enums";
+import { getTaskTypeColor } from "../utils/taskTypeUtils";
 
 interface MonthStats {
   month: number;
@@ -11,6 +13,7 @@ interface MonthStats {
   totalDays: number;
   bestStreak: number;
   isPerfect: boolean;
+  favoriteTypes: TaskType[] | null;
 }
 
 export default function Historic() {
@@ -51,6 +54,25 @@ export default function Historic() {
     "Décembre",
   ];
 
+  const renderFavoriteTypes = (types: TaskType[] | null) => {
+    if (!types) return "Aucune tâche";
+
+    return types.map((type, index) => (
+      <span
+        key={type}
+        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full ${
+          getTaskTypeColor(type).bg
+        } ${getTaskTypeColor(type).text}`}
+      >
+        <span>{getTaskTypeColor(type).icon}</span>
+        <span>{type}</span>
+        {index < types.length - 1 && (
+          <span className="mx-1 text-sage-400">•</span>
+        )}
+      </span>
+    ));
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -86,6 +108,7 @@ export default function Historic() {
             totalDays: new Date(selectedYear, index + 1, 0).getDate(),
             bestStreak: 0,
             isPerfect: false,
+            favoriteTypes: null,
           };
 
           const isCurrentMonth = new Date().getMonth() === index;
@@ -141,6 +164,14 @@ export default function Historic() {
                     >
                       {monthStats.bestStreak} jours
                     </span>
+                  </div>
+                  <div className="pt-2 border-t border-sage-200">
+                    <span className="text-sm text-sage-600 block mb-2">
+                      Type de tâche favori
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {renderFavoriteTypes(monthStats.favoriteTypes)}
+                    </div>
                   </div>
                   {isCurrentMonth && (
                     <div className="mt-2 text-xs text-sage-500 text-center">

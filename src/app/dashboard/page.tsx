@@ -166,7 +166,6 @@ export default function DashboardPage() {
         );
       }
       const data = await response.json();
-      console.log("Data du mois : ", data);
       setMonthlyData(data || null);
     } catch (error) {
       console.error("Erreur détaillée:", error);

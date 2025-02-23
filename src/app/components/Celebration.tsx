@@ -23,7 +23,7 @@ export default function Celebration({
     if (isVisible) {
       const audio = new Audio("/success.mp3");
       audio.volume = 0.5; // Volume à 50%
-      audio.play().catch((error) => console.log("Erreur audio:", error));
+      audio.play().catch((error) => console.error("Erreur audio:", error));
 
       // Programmer la fin de la célébration
       const timer = setTimeout(() => {

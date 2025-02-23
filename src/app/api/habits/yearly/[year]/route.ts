@@ -2,6 +2,7 @@ import { prisma } from "../../../../lib/db";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "../../../../lib/auth";
+import { TaskType } from "../../../../types/enums";
 
 export async function GET(
   req: Request,
@@ -31,41 +32,72 @@ export async function GET(
           totalDays,
           bestStreak: 0,
           isPerfect: false,
+          favoriteTypes: null,
         });
         continue;
       }
 
-      // Récupérer tous les logs du mois
-      const habitLogs = await prisma.habitLog.findMany({
+      // Récupérer tous les logs et habitudes du mois
+      const habits = await prisma.habit.findMany({
         where: {
           userId: session.user.id,
-          date: {
+          startDate: {
             gte: startOfMonth,
             lte: endOfMonth,
           },
         },
-        orderBy: {
-          date: "asc",
+        include: {
+          HabitLog: {
+            where: {
+              date: {
+                gte: startOfMonth,
+                lte: endOfMonth,
+              },
+            },
+          },
         },
       });
 
       // Calculer le nombre de tâches complétées
-      const completedTasks = habitLogs.filter(
-        (log) => log.status === "COMPLETED"
-      ).length;
+      const completedTasks = habits
+        .flatMap((h) => h.HabitLog)
+        .filter((log) => log.status === "COMPLETED").length;
 
       // Calculer la meilleure série du mois
       let currentStreak = 0;
       let bestStreak = 0;
 
-      for (let i = 0; i < habitLogs.length; i++) {
-        if (habitLogs[i].status === "COMPLETED") {
+      const sortedLogs = habits
+        .flatMap((h) => h.HabitLog)
+        .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+      for (let i = 0; i < sortedLogs.length; i++) {
+        if (sortedLogs[i].status === "COMPLETED") {
           currentStreak++;
           bestStreak = Math.max(bestStreak, currentStreak);
         } else {
           currentStreak = 0;
         }
       }
+
+      // Calculer les types de tâches favoris
+      const typeCount = new Map<TaskType, number>();
+      habits.forEach((habit) => {
+        const currentCount = typeCount.get(habit.type) || 0;
+        typeCount.set(habit.type, currentCount + 1);
+      });
+
+      let maxCount = 0;
+      let favoriteTypes: TaskType[] = [];
+
+      typeCount.forEach((count, type) => {
+        if (count > maxCount) {
+          maxCount = count;
+          favoriteTypes = [type];
+        } else if (count === maxCount) {
+          favoriteTypes.push(type);
+        }
+      });
 
       // Vérifier si le mois est parfait (toutes les tâches complétées)
       const isPerfect = completedTasks === totalDays;
@@ -77,6 +109,7 @@ export async function GET(
         totalDays,
         bestStreak,
         isPerfect,
+        favoriteTypes: maxCount > 0 ? favoriteTypes : null,
       });
     }
 
