@@ -16,6 +16,40 @@ interface TaskDetailsModalProps extends TaskModalProps {
   isFutureDate: boolean;
 }
 
+const getTaskTypeColor = (type: TaskType) => {
+  const colorMap = {
+    [TaskType.SPORT]: {
+      bg: "bg-orange-100",
+      text: "text-orange-600",
+      border: "border-orange-200",
+      hover: "hover:bg-orange-200",
+      icon: "🏃‍♂️",
+    },
+    [TaskType.SANTE]: {
+      bg: "bg-emerald-100",
+      text: "text-emerald-600",
+      border: "border-emerald-200",
+      hover: "hover:bg-emerald-200",
+      icon: "💚",
+    },
+    [TaskType.TRAVAIL]: {
+      bg: "bg-blue-100",
+      text: "text-blue-600",
+      border: "border-blue-200",
+      hover: "hover:bg-blue-200",
+      icon: "💼",
+    },
+    [TaskType.LOISIRS]: {
+      bg: "bg-purple-100",
+      text: "text-purple-600",
+      border: "border-purple-200",
+      hover: "hover:bg-purple-200",
+      icon: "🎮",
+    },
+  };
+  return colorMap[type];
+};
+
 export default function TaskDetailsModal({
   isOpen,
   onClose,
@@ -91,7 +125,6 @@ export default function TaskDetailsModal({
       [Status.PENDING]: "bg-sky-100",
       [Status.FUTURE_UNSCHEDULED]: "bg-gray-100",
       [Status.PAST_UNSCHEDULED]: "bg-gray-100",
-
     };
     return colorMap[status as keyof typeof colorMap] || "bg-gray-100";
   };
@@ -181,10 +214,17 @@ export default function TaskDetailsModal({
                     }
                     className="w-full px-4 py-3 rounded-xl border border-sage-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
                   >
-                    <option value={TaskType.SANTE}>Santé</option>
-                    <option value={TaskType.SPORT}>Sport</option>
-                    <option value={TaskType.TRAVAIL}>Travail</option>
-                    <option value={TaskType.LOISIRS}>Loisirs</option>
+                    {Object.values(TaskType).map((type) => (
+                      <option
+                        key={type}
+                        value={type}
+                        className={`${getTaskTypeColor(type).text} ${
+                          getTaskTypeColor(type).bg
+                        }`}
+                      >
+                        {getTaskTypeColor(type).icon} {type}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -193,9 +233,18 @@ export default function TaskDetailsModal({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleScheduleTask}
-                    className="flex-1 bg-emerald-500 text-white py-3 rounded-xl hover:bg-emerald-600 transition-colors"
+                    disabled={isLoading}
+                    className="flex-1 bg-emerald-500 text-white py-3 rounded-xl hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isEditing ? "Modifier" : "Programmer"}
+                    {isLoading ? (
+                      <div className="flex items-center justify-center">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    ) : isEditing ? (
+                      "Modifier"
+                    ) : (
+                      "Programmer"
+                    )}
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.02 }}
@@ -226,6 +275,17 @@ export default function TaskDetailsModal({
                     <p className="mt-2 text-sage-600">{task.description}</p>
                   )}
                 </div>
+
+                {/* Badge du type de tâche */}
+                <div
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full ${
+                    getTaskTypeColor(task.type).bg
+                  } ${getTaskTypeColor(task.type).text}`}
+                >
+                  <span>{getTaskTypeColor(task.type).icon}</span>
+                  <span>{task.type}</span>
+                </div>
+
                 <div className="pt-4 border-t border-sage-200">
                   <span className="text-sm text-sage-500">
                     Status:{" "}
