@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { prisma } from "../../lib/db";
 import { authOptions } from "../../lib/auth";
+import { TaskType } from "../../types/enums";
 
 // Créer la tâche du jour
 export async function POST(req: Request) {
@@ -12,8 +13,13 @@ export async function POST(req: Request) {
       return new NextResponse("Non autorisé", { status: 401 });
     }
 
-    const { title, description, date } = await req.json();
-    
+    const { title, description, date, type } = await req.json();
+
+    // Vérifier que le type est valide
+    if (!Object.values(TaskType).includes(type as TaskType)) {
+      return new NextResponse("Type de tâche invalide", { status: 400 });
+    }
+
     // Utiliser la date fournie ou par défaut la date actuelle
     const startDate = date ? new Date(date) : new Date();
 
@@ -23,6 +29,7 @@ export async function POST(req: Request) {
         description,
         userId: session.user.id,
         startDate, // Utiliser la date sélectionnée
+        type: type || TaskType.LOISIRS, // Utiliser le type fourni ou la valeur par défaut
       },
     });
 

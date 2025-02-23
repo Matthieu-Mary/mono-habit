@@ -14,13 +14,23 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// enums
+// ----------------- enums ----------------------
+
 enum Status {
   UNSCHEDULED
   PENDING
   COMPLETED
   MISSED
 }
+
+enum TaskType {
+  SPORT
+  SANTE
+  TRAVAIL
+  LOISIRS
+}
+
+// -----------------------------------------------
 
 // User model
 model User {
@@ -38,14 +48,6 @@ model User {
   habitLogs     HabitLog[]
 }
 
-// Ajout de l'énumération pour les types de tâches
-enum TaskType {
-  SPORT
-  SANTE
-  TRAVAIL
-  LOISIRS
-}
-
 // Sert à enregistrer les habitudes (ex: manger une pomme, lire un livre, etc.)
 model Habit {
   id          String     @id @default(cuid())
@@ -56,10 +58,8 @@ model Habit {
   user        User       @relation(fields: [userId], references: [id])
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+  type        TaskType   @default(LOISIRS)
   HabitLog    HabitLog[]
-  
-  // Ajout du type de tâche
-  type        TaskType   @default(LOISIRS) // Valeur par défaut
 }
 
 // Sert à enregistrer les logs des habitudes (ex: si on a mangé une pomme aujourd'hui, on enregistre le log)

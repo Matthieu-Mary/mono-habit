@@ -1,0 +1,13 @@
+export enum TaskType {
+  SPORT = "SPORT",
+  SANTE = "SANTE",
+  TRAVAIL = "TRAVAIL",
+  LOISIRS = "LOISIRS"
+}
+
+export enum Status {
+  UNSCHEDULED = "UNSCHEDULED",
+  PENDING = "PENDING",
+  COMPLETED = "COMPLETED",
+  MISSED = "MISSED"
+} 

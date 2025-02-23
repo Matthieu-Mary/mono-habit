@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { TaskType } from "../types/enums";
 
 export interface TaskModalProps {
   isOpen: boolean;
@@ -17,7 +18,7 @@ export default function TaskModal({
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    type: "LOISIRS",
+    type: TaskType.LOISIRS,
   });
 
   // eslint-disable-next-line
@@ -58,7 +59,7 @@ export default function TaskModal({
 
       if (!response.ok) throw new Error("Erreur lors de la création");
 
-      setFormData({ title: "", description: "", type: "LOISIRS" });
+      setFormData({ title: "", description: "", type: TaskType.LOISIRS });
       onSuccess();
       onClose();
     } catch (error) {
@@ -141,14 +142,17 @@ export default function TaskModal({
                   id="type"
                   value={formData.type}
                   onChange={(e) =>
-                    setFormData({ ...formData, type: e.target.value })
+                    setFormData({
+                      ...formData,
+                      type: e.target.value as TaskType,
+                    })
                   }
                   className="w-full px-4 py-3 rounded-xl border border-sage-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
                 >
-                  <option value="SANTE">Santé</option>
-                  <option value="SPORT">Sport</option>
-                  <option value="TRAVAIL">Travail</option>
-                  <option value="LOISIRS">Loisirs</option>
+                  <option value={TaskType.SANTE}>Santé</option>
+                  <option value={TaskType.SPORT}>Sport</option>
+                  <option value={TaskType.TRAVAIL}>Travail</option>
+                  <option value={TaskType.LOISIRS}>Loisirs</option>
                 </select>
               </div>
 

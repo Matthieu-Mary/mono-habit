@@ -1,7 +1,7 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import { Status } from "@prisma/client";
+import { Status, TaskType } from "../types/enums";
 import { TaskModalProps } from "./TaskModal";
 
 interface TaskDetailsModalProps extends TaskModalProps {
@@ -11,7 +11,7 @@ interface TaskDetailsModalProps extends TaskModalProps {
     description?: string;
     status: Status;
     date: string;
-    type: string;
+    type: TaskType;
   } | null;
   isFutureDate: boolean;
 }
@@ -26,7 +26,7 @@ export default function TaskDetailsModal({
   const [formData, setFormData] = useState({
     title: task?.title ?? "",
     description: task?.description ?? "",
-    type: task?.type ?? "LOISIRS",
+    type: task?.type ?? TaskType.LOISIRS,
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -36,7 +36,7 @@ export default function TaskDetailsModal({
     setFormData({
       title: task?.title ?? "",
       description: task?.description ?? "",
-      type: task?.type ?? "LOISIRS",
+      type: task?.type ?? TaskType.LOISIRS,
     });
   }, [task]);
 
@@ -47,9 +47,7 @@ export default function TaskDetailsModal({
       // Si on est en mode édition, on fait un PATCH
       // Sinon, on crée une nouvelle tâche avec POST
       const method = isEditing ? "PATCH" : "POST";
-      const endpoint = isEditing
-        ? `/api/habits/${task?.id}` // Il faudra ajouter l'ID dans l'interface TaskDetails
-        : "/api/habits";
+      const endpoint = isEditing ? `/api/habits/${task?.id}` : "/api/habits";
 
       const response = await fetch(endpoint, {
         method,
@@ -83,15 +81,15 @@ export default function TaskDetailsModal({
   };
 
   // Détermine si on peut éditer la tâche (uniquement si PENDING)
-  const canEdit = task?.status === "PENDING";
+  const canEdit = task?.status === Status.PENDING;
 
   // Fonction pour obtenir la couleur de fond en fonction du statut
   const getBackgroundColor = (status?: Status) => {
     const colorMap = {
-      COMPLETED: "bg-emerald-100",
-      MISSED: "bg-red-100",
-      PENDING: "bg-sky-100",
-      NOT_SCHEDULED: "bg-gray-100",
+      [Status.COMPLETED]: "bg-emerald-100",
+      [Status.MISSED]: "bg-red-100",
+      [Status.PENDING]: "bg-sky-100",
+      [Status.UNSCHEDULED]: "bg-gray-100",
     };
     return colorMap[status as keyof typeof colorMap] || "bg-gray-100";
   };
@@ -174,14 +172,17 @@ export default function TaskDetailsModal({
                     id="type"
                     value={formData.type}
                     onChange={(e) =>
-                      setFormData({ ...formData, type: e.target.value })
+                      setFormData({
+                        ...formData,
+                        type: e.target.value as TaskType,
+                      })
                     }
                     className="w-full px-4 py-3 rounded-xl border border-sage-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
                   >
-                    <option value="SANTE">Santé</option>
-                    <option value="SPORT">Sport</option>
-                    <option value="TRAVAIL">Travail</option>
-                    <option value="LOISIRS">Loisirs</option>
+                    <option value={TaskType.SANTE}>Santé</option>
+                    <option value={TaskType.SPORT}>Sport</option>
+                    <option value={TaskType.TRAVAIL}>Travail</option>
+                    <option value={TaskType.LOISIRS}>Loisirs</option>
                   </select>
                 </div>
 
@@ -203,7 +204,7 @@ export default function TaskDetailsModal({
                         setFormData({
                           title: task?.title ?? "",
                           description: task?.description ?? "",
-                          type: task?.type ?? "LOISIRS",
+                          type: task?.type ?? TaskType.LOISIRS,
                         });
                       } else {
                         onClose();
@@ -226,11 +227,11 @@ export default function TaskDetailsModal({
                 <div className="pt-4 border-t border-sage-200">
                   <span className="text-sm text-sage-500">
                     Status:{" "}
-                    {task.status === "COMPLETED"
+                    {task.status === Status.COMPLETED
                       ? "Complétée"
-                      : task.status === "MISSED"
+                      : task.status === Status.MISSED
                       ? "Manquée"
-                      : task.status === "PENDING"
+                      : task.status === Status.PENDING
                       ? "Programmée"
                       : "Non programmée"}
                   </span>
