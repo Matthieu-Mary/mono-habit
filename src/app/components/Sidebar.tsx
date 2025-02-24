@@ -117,6 +117,20 @@ export default function Sidebar() {
                   <span>Historique</span>
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/challenge"
+                  className={`flex items-center space-x-3 p-3 rounded-xl transition-colors
+                    ${
+                      isActive("/challenge")
+                        ? "bg-emerald-100 text-emerald-700"
+                        : "bg-sage-50 hover:bg-sage-100 text-sage-800"
+                    }`}
+                >
+                  <span className="p-2 bg-emerald-100 rounded-lg">🎯</span>
+                  <span>Challenges</span>
+                </Link>
+              </li>
             </ul>
           </nav>
 
