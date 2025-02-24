@@ -12,3 +12,16 @@ export enum Status {
   COMPLETED = "COMPLETED",
   MISSED = "MISSED",
 }
+
+export enum ChallengeType {
+  MONTHLY_TASKS = "MONTHLY_TASKS",
+  STREAK_DAYS = "STREAK_DAYS",
+  PERFECT_MONTH = "PERFECT_MONTH",
+  TASK_TYPE_GOAL = "TASK_TYPE_GOAL",
+}
+
+export enum ChallengeStatus {
+  ACTIVE = "ACTIVE",
+  COMPLETED = "COMPLETED",
+  FAILED = "FAILED",
+}

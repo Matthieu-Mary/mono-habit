@@ -31,6 +31,19 @@ enum TaskType {
   LOISIRS
 }
 
+enum ChallengeType {
+  MONTHLY_TASKS
+  STREAK_DAYS
+  PERFECT_MONTH
+  TASK_TYPE_GOAL
+}
+
+enum ChallengeStatus {
+  ACTIVE
+  COMPLETED
+  FAILED
+}
+
 // -----------------------------------------------
 
 // User model
@@ -47,6 +60,7 @@ model User {
   sessions      Session[]
   habits        Habit[]
   habitLogs     HabitLog[]
+  challenges    Challenge[]
 }
 
 // Sert à enregistrer les habitudes (ex: manger une pomme, lire un livre, etc.)
@@ -82,6 +96,29 @@ model HabitLog {
 
   @@unique([habitId, date])
   @@index([habitId])
+  @@index([userId])
+}
+
+// Sert à enregistrer les challenges (ex: faire 20 tâches dans le mois)
+model Challenge {
+  id          String          @id @default(cuid())
+  title       String
+  description String?
+  type        ChallengeType
+  goal        Int
+  reward      String
+  penalty     String
+  startDate   DateTime
+  endDate     DateTime
+  status      ChallengeStatus @default(ACTIVE)
+  taskType    TaskType?       // Pour les challenges de type TASK_TYPE_GOAL
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  // Relations
+  userId      String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
 }
 
