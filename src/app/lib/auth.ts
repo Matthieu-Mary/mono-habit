@@ -19,6 +19,7 @@ declare module "next-auth" {
 // FICHIER DE CONFIGURATION DE NEXT JS AUTH (exporté dans le fichier /api/auth/[...nextauth].ts)
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
       name: "credentials",
