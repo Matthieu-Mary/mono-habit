@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import { prisma } from "../../lib/db";
+import { prisma } from "../../lib/prisma";
 import { authOptions } from "../../lib/auth";
 import { TaskType } from "../../types/enums";
 

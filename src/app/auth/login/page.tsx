@@ -29,6 +29,8 @@ export default function Login() {
 
     if (res?.ok) {
       router.push("/dashboard");
+    } else if (res?.status === 401) {
+      setError("Non autorisé");
     } else {
       setError("Identifiants invalides ou erreur.");
     }
