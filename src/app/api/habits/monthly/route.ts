@@ -2,6 +2,7 @@ import { prisma } from "../../../lib/prisma";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../lib/auth";
+import { TaskType } from "../../../types/enums";
 
 export async function GET() {
   try {
@@ -81,7 +82,8 @@ export async function GET() {
         status: habitLog.status,
         date: habitLog.date.toISOString().split("T")[0],
         day: new Date(habitLog.date).getDate(),
-        completed: habitLog.completed
+        completed: habitLog.completed,
+        type: habit.type as TaskType
       }));
     });
 

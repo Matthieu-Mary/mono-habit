@@ -53,7 +53,7 @@ export async function PATCH(
         userId: session.user.id,
       },
       data: {
-        status: "PENDING", // On s'assure que le statut reste PENDING
+        status: "PENDING",
       },
     });
 
