@@ -35,7 +35,24 @@ export async function GET() {
       59
     );
 
-    // On récupère les tâches du mois en cours
+    now.setHours(0, 0, 0, 0);
+
+    // D'abord, mettre à jour tous les HabitLogs PENDING dépassés en MISSED
+    await prisma.habitLog.updateMany({
+      where: {
+        userId: user.id,
+        status: "PENDING",
+        date: {
+          lt: now, // Toutes les dates antérieures à aujourd'hui
+        },
+      },
+      data: {
+        status: "MISSED",
+        completed: false,
+      },
+    });
+
+    // Ensuite, récupérer les données mises à jour
     const habits = await prisma.habit.findMany({
       where: {
         userId: user.id,
@@ -64,8 +81,7 @@ export async function GET() {
         status: habitLog.status,
         date: habitLog.date.toISOString().split("T")[0],
         day: new Date(habitLog.date).getDate(),
-        completed: habitLog.completed,
-        type: habit.type,
+        completed: habitLog.completed
       }));
     });
 
