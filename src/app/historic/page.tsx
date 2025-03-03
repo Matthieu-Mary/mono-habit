@@ -88,9 +88,9 @@ export default function Historic() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex justify-between items-center"
+          className="flex justify-center items-center lg:justify-start"
         >
-          <h1 className="text-2xl font-bold text-sage-800 lg:text-4xl">
+          <h1 className="text-2xl font-bold text-sage-800 lg:text-4xl ">
             Historique {selectedYear}
           </h1>
         </motion.div>
