@@ -184,10 +184,11 @@ export default function DashboardPage() {
     setIsMonthlyProgressLoading(true);
     try {
       await fetchMonthlyHabits();
+      await fetchTodayTask();
     } finally {
       setIsMonthlyProgressLoading(false);
     }
-  }, [fetchMonthlyHabits]);
+  }, [fetchMonthlyHabits, fetchTodayTask]);
 
   if (status === "loading") {
     return (
@@ -364,7 +365,7 @@ export default function DashboardPage() {
       <TaskModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSuccess={fetchTodayTask}
+        onSuccess={handleMonthlySuccess}
       />
     </div>
   );
