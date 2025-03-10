@@ -194,7 +194,7 @@ export default function MonthlyProgress({
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-lg h-full">
+    <div className="bg-white rounded-2xl p-6 shadow-lg">
       <h2 className="text-xl font-semibold text-sage-800 mb-4 capitalize">
         {currentMonthName} {year}
       </h2>
