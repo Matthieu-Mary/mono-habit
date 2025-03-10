@@ -117,7 +117,7 @@ export default function Sidebar() {
                   <span>Historique</span>
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/challenge"
                   className={`flex items-center space-x-3 p-3 rounded-xl transition-colors
@@ -130,7 +130,7 @@ export default function Sidebar() {
                   <span className="p-2 bg-emerald-100 rounded-lg">🎯</span>
                   <span>Challenges</span>
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </nav>
 

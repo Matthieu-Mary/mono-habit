@@ -10,6 +10,7 @@ import Celebration from "../components/Celebration";
 import MonthlyProgress from "../components/MonthlyProgress";
 import { MonthlyResponseData } from "../interfaces/monthData.interface";
 import StatsCard from "../components/StatsCard";
+import ChallengeModal from "../components/ChallengeModal";
 
 function calculateTimeRemaining(): string {
   const now = new Date();
@@ -43,6 +44,7 @@ export default function DashboardPage() {
   const [currentTime, setCurrentTime] = useState("");
   const [isCompleted, setIsCompleted] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isChallengeModalOpen, setIsChallengeModalOpen] = useState(false);
   const [showTimeTooltip, setShowTimeTooltip] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [currentTask, setCurrentTask] = useState<{
@@ -326,7 +328,7 @@ export default function DashboardPage() {
           </motion.div>
 
           {/* Remplacer le bloc infos par le nouveau composant */}
-          <StatsCard />
+          <StatsCard onNewChallenge={() => setIsChallengeModalOpen(true)} />
         </div>
 
         {/* Historique des habitudes */}
@@ -366,6 +368,11 @@ export default function DashboardPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={handleMonthlySuccess}
+      />
+
+      <ChallengeModal
+        isOpen={isChallengeModalOpen}
+        onClose={() => setIsChallengeModalOpen(false)}
       />
     </div>
   );
