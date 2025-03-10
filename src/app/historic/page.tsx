@@ -14,6 +14,10 @@ interface MonthStats {
   bestStreak: number;
   isPerfect: boolean;
   favoriteTypes: TaskType[] | null;
+  challenge?: {
+    title: string;
+    status: string;
+  } | null;
 }
 
 export default function Historic() {
@@ -109,6 +113,7 @@ export default function Historic() {
             bestStreak: 0,
             isPerfect: false,
             favoriteTypes: null,
+            challenge: null,
           };
 
           const isCurrentMonth = new Date().getMonth() === index;
@@ -169,10 +174,58 @@ export default function Historic() {
                     <span className="text-sm text-sage-600 block mb-2">
                       Type de tâche favori
                     </span>
-                    <div className="flex flex-wrap gap-2">
-                      {renderFavoriteTypes(monthStats.favoriteTypes)}
-                    </div>
+                    {/* On applique un style dynamique en fonction du nombre de tâches (ici si il n'ya aucune tâche, on applique un style différent) */}
+                    {(() => {
+                      const favoriteTypesResult = renderFavoriteTypes(
+                        monthStats.favoriteTypes
+                      );
+                      const isNoTask = favoriteTypesResult === "Aucune tâche";
+
+                      return (
+                        <div
+                          className={`flex flex-wrap gap-2 ${
+                            isNoTask ? "text-sm text-sage-500 italic" : ""
+                          }`}
+                        >
+                          {favoriteTypesResult}
+                        </div>
+                      );
+                    })()}
                   </div>
+
+                  {/* Nouvelle section pour les challenges - sans séparateur */}
+                  <div className="pt-2 flex items-center justify-between">
+                    <span className="text-sm text-sage-600 block mb-2">
+                      Challenge
+                    </span>
+                    {monthStats.challenge ? (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-sage-800">
+                          {monthStats.challenge.title}
+                        </span>
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full ${
+                            monthStats.challenge.status === "COMPLETED"
+                              ? "bg-green-100 text-green-800"
+                              : monthStats.challenge.status === "FAILED"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-blue-100 text-blue-800"
+                          }`}
+                        >
+                          {monthStats.challenge.status === "COMPLETED"
+                            ? "Réussi"
+                            : monthStats.challenge.status === "FAILED"
+                            ? "Échoué"
+                            : "En cours"}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-sage-500 italic">
+                        Aucun challenge
+                      </span>
+                    )}
+                  </div>
+
                   {isCurrentMonth && (
                     <div className="mt-2 text-xs text-sage-500 text-center">
                       Mois en cours

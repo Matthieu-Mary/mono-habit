@@ -102,6 +102,21 @@ export async function GET(
       // Vérifier si le mois est parfait (toutes les tâches complétées)
       const isPerfect = completedTasks === totalDays;
 
+      // Récupérer le challenge pour ce mois
+      const challenge = await prisma.challenge.findFirst({
+        where: {
+          userId: session.user.id,
+          startDate: {
+            gte: new Date(year, month - 1, 1),
+            lt: new Date(year, month, 1),
+          },
+        },
+        select: {
+          title: true,
+          status: true,
+        },
+      });
+
       monthsStats.push({
         month,
         year,
@@ -110,12 +125,13 @@ export async function GET(
         bestStreak,
         isPerfect,
         favoriteTypes: maxCount > 0 ? favoriteTypes : null,
+        challenge,
       });
     }
 
     return NextResponse.json(monthsStats);
   } catch (error) {
-    console.error(error);
+    console.error("Erreur lors de la récupération des statistiques:", error);
     return new NextResponse("Erreur interne", { status: 500 });
   }
 }
