@@ -1,28 +1,37 @@
 import { ChallengeType } from "../types/enums";
 
-export const challengeTypeInfo = {
-  [ChallengeType.MONTHLY_TASKS]: {
-      title: "Objectif mensuel de tâches",
-      description: "Accomplissez un certain nombre de tâches dans le mois",
-      example: "Exemple : Réaliser 20 tâches ce mois-ci",
-      icon: "📊",
-    },
-    [ChallengeType.STREAK_DAYS]: {
-      title: "Série de jours consécutifs",
-      description: "Maintenez une série de jours avec des tâches accomplies",
-      example: "Exemple : 7 jours consécutifs avec au moins une tâche",
-      icon: "🔥",
-    },
-    [ChallengeType.PERFECT_MONTH]: {
-      title: "Mois parfait",
-      description: "Accomplissez toutes vos tâches pendant un mois entier",
-      example: "Exemple : Aucune tâche manquée en mars",
-      icon: "⭐",
-    },
-    [ChallengeType.TASK_TYPE_GOAL]: {
-      title: "Objectif par type de tâche",
-      description: "Atteignez un objectif pour un type de tâche spécifique",
-      example: "Exemple : 10 tâches de sport ce mois-ci",
-      icon: "🎯",
-    },
-  };
+interface ChallengeTypeDetails {
+  title: string;
+  description: string;
+  example: string;
+  icon: string;
+}
+
+export const challengeTypeInfo: Record<ChallengeType, ChallengeTypeDetails> = {
+  [ChallengeType.MONTHLY_TASK_GOAL]: {
+    title: "Objectif mensuel de tâches",
+    description: "Définissez un nombre de tâches à accomplir ce mois-ci",
+    example: "Ex: Accomplir 20 tâches ce mois-ci",
+    icon: "🎯",
+  },
+  [ChallengeType.PERFECT_MONTH]: {
+    title: "Mois parfait",
+    description: "Accomplissez une tâche chaque jour du mois",
+    example: "Ex: Ne manquez aucun jour ce mois-ci",
+    icon: "🏆",
+  },
+  [ChallengeType.STREAK_GOAL]: {
+    title: "Série de jours consécutifs",
+    description:
+      "Maintenez une série de jours consécutifs avec des tâches accomplies",
+    example: "Ex: Maintenir une série de 7 jours consécutifs",
+    icon: "🔥",
+  },
+  [ChallengeType.TASK_TYPE_GOAL]: {
+    title: "Objectif par type de tâche",
+    description:
+      "Accomplissez un certain nombre de tâches d'un type spécifique",
+    example: "Ex: Accomplir 10 tâches de type Sport ce mois-ci",
+    icon: "📊",
+  },
+};

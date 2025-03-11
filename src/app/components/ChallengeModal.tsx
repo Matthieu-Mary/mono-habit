@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChallengeType, TaskType } from "../types/enums";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import ChallengeTypeInfo from "./ChallengeTypeInfo";
@@ -20,13 +20,19 @@ export default function ChallengeModal({
   const [step, setStep] = useState(1);
   const [type, setType] = useState<ChallengeType | undefined>(initialType);
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
   const [goal, setGoal] = useState(0);
   const [reward, setReward] = useState("");
   const [penalty, setPenalty] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const [taskType, setTaskType] = useState<TaskType | undefined>();
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Réinitialiser le type si initialType change
+  useEffect(() => {
+    if (initialType) {
+      setType(initialType);
+      setStep(2);
+    }
+  }, [initialType]);
 
   const handleTypeSelect = (selectedType: ChallengeType) => {
     setType(selectedType);
@@ -35,25 +41,35 @@ export default function ChallengeModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
+      // Préparer les données selon le type de challenge
+      const challengeData: any = {
+        type,
+        reward,
+        penalty,
+      };
+
+      // Ajouter les champs spécifiques selon le type de challenge
+      if (
+        type === ChallengeType.MONTHLY_TASK_GOAL ||
+        type === ChallengeType.STREAK_GOAL ||
+        type === ChallengeType.TASK_TYPE_GOAL
+      ) {
+        challengeData.goal = goal;
+      }
+
+      if (type === ChallengeType.TASK_TYPE_GOAL) {
+        challengeData.taskType = taskType;
+      }
+
       const response = await fetch("/api/challenges", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          title,
-          description,
-          type,
-          goal,
-          reward,
-          penalty,
-          startDate,
-          endDate,
-          taskType:
-            type === ChallengeType.TASK_TYPE_GOAL ? taskType : undefined,
-        }),
+        body: JSON.stringify(challengeData),
       });
 
       if (!response.ok) {
@@ -61,38 +77,51 @@ export default function ChallengeModal({
       }
 
       // Réinitialiser le formulaire
-      setStep(1);
-      setType(undefined);
-      setTitle("");
-      setDescription("");
-      setGoal(0);
-      setReward("");
-      setPenalty("");
-      setStartDate("");
-      setEndDate("");
-      setTaskType(undefined);
-
+      resetForm();
       onClose();
     } catch (error) {
       console.error("Erreur:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleClose = () => {
-    // Réinitialiser le formulaire
+  const resetForm = () => {
     setStep(1);
     setType(undefined);
     setTitle("");
-    setDescription("");
     setGoal(0);
     setReward("");
     setPenalty("");
-    setStartDate("");
-    setEndDate("");
     setTaskType(undefined);
+  };
 
+  const handleClose = () => {
+    resetForm();
     onClose();
   };
+
+  // Animation des particules en arrière-plan (comme dans TaskModal)
+  const particles = Array.from({ length: 20 }).map((_, i) => (
+    <motion.div
+      key={i}
+      className="absolute w-2 h-2 bg-emerald-200 rounded-full"
+      initial={{
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+      }}
+      animate={{
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        scale: [1, 1.5, 1],
+      }}
+      transition={{
+        duration: Math.random() * 5 + 3,
+        repeat: Infinity,
+        ease: "linear",
+      }}
+    />
+  ));
 
   return (
     <AnimatePresence>
@@ -104,22 +133,29 @@ export default function ChallengeModal({
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center"
           onClick={handleClose}
         >
+          {/* Particules d'arrière-plan */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {particles}
+          </div>
+
           <motion.div
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
-            className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all m-4"
+            className="bg-white rounded-3xl p-8 shadow-xl max-w-md w-full mx-4 relative text-sage-800"
             onClick={(e) => e.stopPropagation()}
           >
+            <div className="absolute -top-2 -left-2 w-full h-full bg-emerald-100 rounded-3xl -z-10 transform rotate-1"></div>
+
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-medium leading-6 text-sage-900">
+              <h2 className="text-2xl font-bold text-sage-800">
                 {step === 1
                   ? "Choisir un type de challenge"
-                  : "Créer un nouveau challenge"}
-              </h3>
+                  : "Nouveau challenge"}
+              </h2>
               <button
                 type="button"
-                className="rounded-md text-sage-400 hover:text-sage-500"
+                className="text-sage-400 hover:text-sage-500"
                 onClick={handleClose}
               >
                 <XMarkIcon className="h-6 w-6" aria-hidden="true" />
@@ -129,64 +165,34 @@ export default function ChallengeModal({
             {step === 1 ? (
               <ChallengeTypeInfo onSelect={handleTypeSelect} />
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="title"
-                    className="block text-sm font-medium text-sage-700"
-                  >
-                    Titre
-                  </label>
-                  <input
-                    type="text"
-                    id="title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="mt-1 block w-full rounded-md border-sage-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
-                    required
-                  />
-                </div>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Champ Objectif pour les types qui en ont besoin */}
+                {(type === ChallengeType.MONTHLY_TASK_GOAL ||
+                  type === ChallengeType.STREAK_GOAL ||
+                  type === ChallengeType.TASK_TYPE_GOAL) && (
+                  <div>
+                    <label className="block text-sage-700 mb-2" htmlFor="goal">
+                      Objectif
+                    </label>
+                    <motion.input
+                      whileFocus={{ scale: 1.02 }}
+                      type="number"
+                      id="goal"
+                      value={goal}
+                      onChange={(e) => setGoal(parseInt(e.target.value) || 0)}
+                      className="w-full px-4 py-3 rounded-xl border border-sage-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
+                      required
+                      min="1"
+                    />
+                  </div>
+                )}
 
-                <div>
-                  <label
-                    htmlFor="description"
-                    className="block text-sm font-medium text-sage-700"
-                  >
-                    Description
-                  </label>
-                  <textarea
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    rows={3}
-                    className="mt-1 block w-full rounded-md border-sage-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="goal"
-                    className="block text-sm font-medium text-sage-700"
-                  >
-                    Objectif
-                  </label>
-                  <input
-                    type="number"
-                    id="goal"
-                    value={goal}
-                    onChange={(e) => setGoal(parseInt(e.target.value))}
-                    className="mt-1 block w-full rounded-md border-sage-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
-                    required
-                    min="1"
-                  />
-                </div>
-
+                {/* Champ Type de tâche pour TASK_TYPE_GOAL */}
                 {type === ChallengeType.TASK_TYPE_GOAL && (
                   <div>
                     <label
+                      className="block text-sage-700 mb-2"
                       htmlFor="taskType"
-                      className="block text-sm font-medium text-sage-700"
                     >
                       Type de tâche
                     </label>
@@ -194,7 +200,7 @@ export default function ChallengeModal({
                       id="taskType"
                       value={taskType}
                       onChange={(e) => setTaskType(e.target.value as TaskType)}
-                      className="mt-1 block w-full rounded-md border-sage-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
+                      className="w-full px-4 py-3 rounded-xl border border-sage-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
                       required
                     >
                       <option value="">Sélectionner un type</option>
@@ -207,85 +213,45 @@ export default function ChallengeModal({
                   </div>
                 )}
 
+                {/* Champ Récompense (optionnel pour tous) */}
                 <div>
-                  <label
-                    htmlFor="reward"
-                    className="block text-sm font-medium text-sage-700"
-                  >
-                    Récompense
+                  <label className="block text-sage-700 mb-2" htmlFor="reward">
+                    Récompense (optionnelle)
                   </label>
-                  <input
+                  <motion.input
+                    whileFocus={{ scale: 1.02 }}
                     type="text"
                     id="reward"
                     value={reward}
                     onChange={(e) => setReward(e.target.value)}
-                    className="mt-1 block w-full rounded-md border-sage-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
-                    required
+                    className="w-full px-4 py-3 rounded-xl border border-sage-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
                     placeholder="Ex: Un dîner au restaurant"
                   />
                 </div>
 
+                {/* Champ Pénalité (optionnel pour tous) */}
                 <div>
-                  <label
-                    htmlFor="penalty"
-                    className="block text-sm font-medium text-sage-700"
-                  >
-                    Pénalité
+                  <label className="block text-sage-700 mb-2" htmlFor="penalty">
+                    Pénalité (optionnelle)
                   </label>
-                  <input
+                  <motion.input
+                    whileFocus={{ scale: 1.02 }}
                     type="text"
                     id="penalty"
                     value={penalty}
                     onChange={(e) => setPenalty(e.target.value)}
-                    className="mt-1 block w-full rounded-md border-sage-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
-                    required
+                    className="w-full px-4 py-3 rounded-xl border border-sage-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
                     placeholder="Ex: Don de 20€ à une association"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="startDate"
-                      className="block text-sm font-medium text-sage-700"
-                    >
-                      Date de début
-                    </label>
-                    <input
-                      type="date"
-                      id="startDate"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      className="mt-1 block w-full rounded-md border-sage-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="endDate"
-                      className="block text-sm font-medium text-sage-700"
-                    >
-                      Date de fin
-                    </label>
-                    <input
-                      type="date"
-                      id="endDate"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      className="mt-1 block w-full rounded-md border-sage-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-6 flex justify-end space-x-3">
+                <div className="flex gap-4 pt-4">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     type="button"
-                    className="rounded-md border border-sage-300 bg-white px-4 py-2 text-sm font-medium text-sage-700 hover:bg-sage-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                     onClick={() => setStep(1)}
+                    className="flex-1 bg-sage-100 text-sage-700 py-3 rounded-xl hover:bg-sage-200 transition-colors"
                   >
                     Retour
                   </motion.button>
@@ -293,9 +259,16 @@ export default function ChallengeModal({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     type="submit"
-                    className="rounded-md border border-transparent bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                    disabled={isLoading}
+                    className="flex-1 bg-emerald-500 text-white py-3 rounded-xl hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Créer
+                    {isLoading ? (
+                      <div className="flex items-center justify-center">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    ) : (
+                      "Créer"
+                    )}
                   </motion.button>
                 </div>
               </form>
