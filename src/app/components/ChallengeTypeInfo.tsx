@@ -12,18 +12,18 @@ export default function ChallengeTypeInfo({
   onSelect,
 }: Readonly<ChallengeTypeInfoProps>) {
   return (
-    <div className="grid grid-cols-1 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
       {Object.entries(challengeTypeInfo).map(([type, info]) => (
         <motion.div
           key={type}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => onSelect(type as ChallengeType)}
-          className="bg-sage-50 rounded-xl p-6 cursor-pointer hover:bg-sage-100 transition-all duration-200"
+          className="bg-sage-50 rounded-xl p-6 cursor-pointer hover:bg-sage-100 transition-all duration-200 h-full flex flex-col"
         >
-          <div className="flex items-center gap-4">
-            <div className="text-3xl">{info.icon}</div>
-            <div>
+          <div className="flex items-start gap-4 h-full">
+            <div className="text-3xl flex-shrink-0">{info.icon}</div>
+            <div className="flex-grow">
               <h3 className="text-lg font-semibold text-sage-800 mb-1">
                 {info.title}
               </h3>

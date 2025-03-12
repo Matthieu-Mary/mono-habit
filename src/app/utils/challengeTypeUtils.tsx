@@ -14,18 +14,18 @@ export const challengeTypeInfo: Record<ChallengeType, ChallengeTypeDetails> = {
     example: "Ex: Accomplir 20 tâches ce mois-ci",
     icon: "🎯",
   },
-  [ChallengeType.PERFECT_MONTH]: {
-    title: "Mois parfait",
-    description: "Accomplissez une tâche chaque jour du mois",
-    example: "Ex: Ne manquez aucun jour ce mois-ci",
-    icon: "🏆",
-  },
   [ChallengeType.STREAK_GOAL]: {
     title: "Série de jours consécutifs",
     description:
       "Maintenez une série de jours consécutifs avec des tâches accomplies",
     example: "Ex: Maintenir une série de 7 jours consécutifs",
     icon: "🔥",
+  },
+  [ChallengeType.PERFECT_MONTH]: {
+    title: "Mois parfait",
+    description: "Accomplissez une tâche chaque jour du mois",
+    example: "Ne manquez aucun jour ce mois-ci",
+    icon: "🏆",
   },
   [ChallengeType.TASK_TYPE_GOAL]: {
     title: "Objectif par type de tâche",

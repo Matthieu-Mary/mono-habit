@@ -147,7 +147,9 @@ export default function Historic() {
               {!isFutureMonth ? (
                 <div className="space-y-4 mt-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-sage-600">Tâches complétées</span>
+                    <span className="pt-1 text-sage-600">
+                      Tâches complétées
+                    </span>
                     <span
                       className={`font-mono font-bold ${
                         monthStats.isPerfect
@@ -159,7 +161,7 @@ export default function Historic() {
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sage-600">Meilleure série</span>
+                    <span className="pt-1 text-sage-600">Meilleure série</span>
                     <span
                       className={`font-mono font-bold ${
                         monthStats.isPerfect
@@ -170,8 +172,8 @@ export default function Historic() {
                       {monthStats.bestStreak} jours
                     </span>
                   </div>
-                  <div className="pt-2 border-sage-200 flex items-center justify-between">
-                    <span className="text-sm text-sage-600 block mb-2">
+                  <div className="pt-1 border-sage-200 flex items-center justify-between">
+                    <span className="text-sage-600 block">
                       Type de tâche favori
                     </span>
                     {/* On applique un style dynamique en fonction du nombre de tâches (ici si il n'ya aucune tâche, on applique un style différent) */}
@@ -194,10 +196,8 @@ export default function Historic() {
                   </div>
 
                   {/* Nouvelle section pour les challenges - sans séparateur */}
-                  <div className="pt-2 flex items-center justify-between">
-                    <span className="text-sm text-sage-600 block mb-2">
-                      Challenge
-                    </span>
+                  <div className="pt-1 flex items-center justify-between">
+                    <span className="text-sage-600 block">Challenge</span>
                     {monthStats.challenge ? (
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-sage-800">
