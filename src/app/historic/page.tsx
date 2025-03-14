@@ -125,7 +125,7 @@ export default function Historic() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className={`bg-white rounded-2xl p-6 shadow-lg relative overflow-hidden min-h-[245px]
+              className={`bg-white rounded-2xl p-6 shadow-lg relative overflow-hidden min-h-[292px]
                 ${
                   monthStats.isPerfect
                     ? "bg-gradient-to-br from-yellow-100 to-amber-100"
