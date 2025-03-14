@@ -106,10 +106,9 @@ model Challenge {
   description String?
   type        ChallengeType
   goal        Int
-  reward      String
-  penalty     String
-  startDate   DateTime
-  endDate     DateTime
+  reward      String?
+  penalty     String?
+  month       Int             // Pour identifier a quel mois appartient le challenge
   status      ChallengeStatus @default(ACTIVE)
   taskType    TaskType?       // Pour les challenges de type TASK_TYPE_GOAL
   createdAt   DateTime        @default(now())

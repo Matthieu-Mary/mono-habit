@@ -1,25 +1,27 @@
 import { ChallengeType } from "../types/enums";
+import { CalendarDaysIcon, FireIcon } from "@heroicons/react/24/outline";
 
-interface ChallengeTypeDetails {
+interface ChallengeTypeInfo {
   title: string;
   description: string;
   example: string;
-  icon: string;
+  icon: React.ReactNode;
 }
 
-export const challengeTypeInfo: Record<ChallengeType, ChallengeTypeDetails> = {
-  [ChallengeType.MONTHLY_TASK_GOAL]: {
-    title: "Objectif mensuel de tâches",
-    description: "Définissez un nombre de tâches à accomplir ce mois-ci",
-    example: "Ex: Accomplir 20 tâches ce mois-ci",
-    icon: "🎯",
-  },
-  [ChallengeType.STREAK_GOAL]: {
-    title: "Série de jours consécutifs",
+export const challengeTypeInfo: Record<ChallengeType, ChallengeTypeInfo> = {
+  [ChallengeType.MONTHLY_TASKS]: {
+    title: "Objectif de tâches mensuelles",
     description:
-      "Maintenez une série de jours consécutifs avec des tâches accomplies",
+      "Fixez-vous un objectif de nombre de tâches à accomplir ce mois-ci.",
+    example: "Ex: Accomplir 20 tâches ce mois-ci",
+    icon: <CalendarDaysIcon className="h-6 w-6" />,
+  },
+  [ChallengeType.STREAK_DAYS]: {
+    title: "Objectif de série",
+    description:
+      "Fixez-vous un objectif de jours consécutifs à accomplir vos tâches.",
     example: "Ex: Maintenir une série de 7 jours consécutifs",
-    icon: "🔥",
+    icon: <FireIcon className="h-6 w-6" />,
   },
   [ChallengeType.PERFECT_MONTH]: {
     title: "Mois parfait",

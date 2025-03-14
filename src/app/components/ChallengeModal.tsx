@@ -11,16 +11,17 @@ interface ChallengeModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedType?: ChallengeType;
+  onSuccess?: () => void;
 }
 
 export default function ChallengeModal({
   isOpen,
   onClose,
   selectedType: initialType,
+  onSuccess,
 }: ChallengeModalProps) {
   const [step, setStep] = useState(1);
   const [type, setType] = useState<ChallengeType | undefined>(initialType);
-  const [title, setTitle] = useState("");
   const [goal, setGoal] = useState(0);
   const [reward, setReward] = useState("");
   const [penalty, setPenalty] = useState("");
@@ -45,25 +46,16 @@ export default function ChallengeModal({
     setIsLoading(true);
 
     try {
-      // Préparer les données selon le type de challenge
-      const challengeData: any = {
-        type,
-        reward,
-        penalty,
+      // Préparer des données minimales pour le challenge
+      const challengeData = {
+        type: type || ChallengeType.MONTHLY_TASKS,
+        goal: goal > 0 ? goal : 1,
+        reward: reward || "",
+        penalty: penalty || "",
+        taskType: type === ChallengeType.TASK_TYPE_GOAL ? taskType : null,
       };
 
-      // Ajouter les champs spécifiques selon le type de challenge
-      if (
-        type === ChallengeType.MONTHLY_TASK_GOAL ||
-        type === ChallengeType.STREAK_GOAL ||
-        type === ChallengeType.TASK_TYPE_GOAL
-      ) {
-        challengeData.goal = goal;
-      }
-
-      if (type === ChallengeType.TASK_TYPE_GOAL) {
-        challengeData.taskType = taskType;
-      }
+      console.log("Données du challenge à envoyer:", challengeData);
 
       const response = await fetch("/api/challenges", {
         method: "POST",
@@ -73,15 +65,30 @@ export default function ChallengeModal({
         body: JSON.stringify(challengeData),
       });
 
+      console.log("Statut de la réponse:", response.status);
+
       if (!response.ok) {
+        const responseText = await response.text();
+        console.log("Texte de la réponse d'erreur:", responseText);
         throw new Error("Erreur lors de la création du challenge");
       }
+
+      const responseText = await response.text();
+      console.log("Texte de la réponse:", responseText);
 
       // Réinitialiser le formulaire
       resetForm();
       onClose();
+
+      // Appeler la fonction de rappel si elle existe
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error) {
-      console.error("Erreur:", error);
+      console.error("Erreur détaillée:", error);
+      alert(
+        `Erreur: ${error instanceof Error ? error.message : "Erreur inconnue"}`
+      );
     } finally {
       setIsLoading(false);
     }
@@ -90,7 +97,6 @@ export default function ChallengeModal({
   const resetForm = () => {
     setStep(1);
     setType(undefined);
-    setTitle("");
     setGoal(0);
     setReward("");
     setPenalty("");
@@ -170,8 +176,8 @@ export default function ChallengeModal({
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Champ Objectif pour les types qui en ont besoin */}
-                {(type === ChallengeType.MONTHLY_TASK_GOAL ||
-                  type === ChallengeType.STREAK_GOAL ||
+                {(type === ChallengeType.MONTHLY_TASKS ||
+                  type === ChallengeType.STREAK_DAYS ||
                   type === ChallengeType.TASK_TYPE_GOAL) && (
                   <div>
                     <label className="block text-sage-700 mb-2" htmlFor="goal">

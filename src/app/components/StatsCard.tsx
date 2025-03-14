@@ -18,25 +18,32 @@ interface Stats {
 interface Challenge {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
   type: ChallengeType;
   goal: number;
   reward: string;
   penalty: string;
-  startDate: string;
-  endDate: string;
+  month: number;
   status: ChallengeStatus;
+  taskType?: TaskType | null;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
 }
 
 interface StatsCardProps {
   onNewChallenge: () => void;
+  currentChallenge: Challenge | null;
+  isLoadingChallenge: boolean;
 }
 
-export default function StatsCard({ onNewChallenge }: StatsCardProps) {
+export default function StatsCard({
+  onNewChallenge,
+  currentChallenge,
+  isLoadingChallenge,
+}: StatsCardProps) {
   const [stats, setStats] = useState<Stats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeChallenge, setActiveChallenge] = useState<Challenge | null>(null);
-  const [isLoadingChallenge, setIsLoadingChallenge] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -55,26 +62,6 @@ export default function StatsCard({ onNewChallenge }: StatsCardProps) {
     };
 
     fetchStats();
-  }, []);
-
-  useEffect(() => {
-    const fetchActiveChallenge = async () => {
-      try {
-        const response = await fetch("/api/challenges/active");
-        if (!response.ok)
-          throw new Error("Erreur lors du chargement du challenge actif");
-
-        const data = await response.json();
-        setActiveChallenge(data.challenge || null);
-      } catch (error) {
-        console.error("Erreur:", error);
-        setActiveChallenge(null);
-      } finally {
-        setIsLoadingChallenge(false);
-      }
-    };
-
-    fetchActiveChallenge();
   }, []);
 
   const renderFavoriteTypes = () => {
@@ -142,31 +129,55 @@ export default function StatsCard({ onNewChallenge }: StatsCardProps) {
         <div className="bg-sage-50 py-4 px-5 rounded-xl">
           <h3 className="text-sm text-sage-600 mb-3 flex items-center justify-between">
             <span>Challenge du mois</span>
-            {activeChallenge && (
+            {currentChallenge && (
               <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
                 En cours
               </span>
             )}
           </h3>
-          
+
           {isLoadingChallenge ? (
             <div className="flex justify-center py-3">
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-emerald-600"></div>
             </div>
-          ) : activeChallenge ? (
+          ) : currentChallenge ? (
             <div className="space-y-2">
-              <h4 className="font-medium text-sage-800">{activeChallenge.title}</h4>
-              <p className="text-sm text-sage-600">{activeChallenge.description}</p>
+              <h4 className="font-medium text-sage-800">
+                {currentChallenge.title}
+              </h4>
+              {currentChallenge.description && (
+                <p className="text-sm text-sage-600">
+                  {currentChallenge.description}
+                </p>
+              )}
               <div className="text-xs text-sage-500 space-y-1">
-                <p>Objectif : {activeChallenge.goal}</p>
-                <p>Du {formatDate(activeChallenge.startDate)} au {formatDate(activeChallenge.endDate)}</p>
-                <p>Récompense : <span className="text-emerald-600">{activeChallenge.reward}</span></p>
+                <p>Objectif : {currentChallenge.goal}</p>
+                <p>Type : {currentChallenge.type}</p>
+                {currentChallenge.taskType && (
+                  <p>Type de tâche : {currentChallenge.taskType}</p>
+                )}
+                <p>
+                  Récompense :{" "}
+                  <span className="text-emerald-600">
+                    {currentChallenge.reward || "Aucune"}
+                  </span>
+                </p>
+                {currentChallenge.penalty && (
+                  <p>
+                    Pénalité :{" "}
+                    <span className="text-red-600">
+                      {currentChallenge.penalty}
+                    </span>
+                  </p>
+                )}
               </div>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-3">
               <TrophyIcon className="h-8 w-8 text-sage-400 mb-2" />
-              <p className="text-sm text-sage-600 mb-3">Aucun challenge en cours</p>
+              <p className="text-sm text-sage-600 mb-3">
+                Aucun challenge en cours
+              </p>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}

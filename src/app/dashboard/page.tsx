@@ -11,6 +11,7 @@ import MonthlyProgress from "../components/MonthlyProgress";
 import { MonthlyResponseData } from "../interfaces/monthData.interface";
 import StatsCard from "../components/StatsCard";
 import ChallengeModal from "../components/ChallengeModal";
+import { Challenge } from "../interfaces/challenges.interface";
 
 function calculateTimeRemaining(): string {
   const now = new Date();
@@ -62,6 +63,11 @@ export default function DashboardPage() {
   const [monthlyData, setMonthlyData] = useState<MonthlyResponseData | null>(
     null
   );
+
+  const [currentChallenge, setCurrentChallenge] = useState<Challenge | null>(
+    null
+  );
+  const [isLoadingChallenge, setIsLoadingChallenge] = useState(false);
 
   useEffect(() => {
     // Mettre à jour le temps restant seulement si la tâche n'est pas complétée
@@ -191,6 +197,31 @@ export default function DashboardPage() {
       setIsMonthlyProgressLoading(false);
     }
   }, [fetchMonthlyHabits, fetchTodayTask]);
+
+  // Fonction pour récupérer le challenge du mois en cours
+  const fetchCurrentChallenge = useCallback(async () => {
+    setIsLoadingChallenge(true);
+    try {
+      const response = await fetch("/api/challenges/current");
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement du challenge actuel");
+      }
+      const data = await response.json();
+      setCurrentChallenge(data.challenge || null);
+    } catch (error) {
+      console.error("Erreur:", error);
+    } finally {
+      setIsLoadingChallenge(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCurrentChallenge();
+  }, [fetchCurrentChallenge]);
+
+  const handleChallengeSuccess = useCallback(async () => {
+    await fetchCurrentChallenge();
+  }, [fetchCurrentChallenge]);
 
   if (status === "loading") {
     return (
@@ -328,7 +359,11 @@ export default function DashboardPage() {
           </motion.div>
 
           {/* Remplacer le bloc infos par le nouveau composant */}
-          <StatsCard onNewChallenge={() => setIsChallengeModalOpen(true)} />
+          <StatsCard
+            onNewChallenge={() => setIsChallengeModalOpen(true)}
+            currentChallenge={currentChallenge}
+            isLoadingChallenge={isLoadingChallenge}
+          />
         </div>
 
         {/* Historique des habitudes */}
@@ -373,6 +408,7 @@ export default function DashboardPage() {
       <ChallengeModal
         isOpen={isChallengeModalOpen}
         onClose={() => setIsChallengeModalOpen(false)}
+        onSuccess={handleChallengeSuccess}
       />
     </div>
   );
