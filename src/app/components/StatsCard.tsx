@@ -6,6 +6,7 @@ import { TaskType } from "../types/enums";
 import { getTaskTypeColor } from "../utils/taskTypeUtils";
 import { ChallengeStatus, ChallengeType } from "../types/enums";
 import { PlusIcon, TrophyIcon } from "@heroicons/react/24/outline";
+import { challengeTypeInfo } from "../utils/challengeTypeUtils";
 
 interface Stats {
   successRate: number;
@@ -31,6 +32,13 @@ interface Challenge {
   userId: string;
 }
 
+interface ChallengeProgress {
+  challenge: Challenge;
+  progress: number;
+  total: number;
+  percentage: number;
+}
+
 interface StatsCardProps {
   onNewChallenge: () => void;
   currentChallenge: Challenge | null;
@@ -44,6 +52,9 @@ export default function StatsCard({
 }: StatsCardProps) {
   const [stats, setStats] = useState<Stats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [challengeProgress, setChallengeProgress] =
+    useState<ChallengeProgress | null>(null);
+  const [isLoadingProgress, setIsLoadingProgress] = useState(false);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -64,6 +75,34 @@ export default function StatsCard({
     fetchStats();
   }, []);
 
+  // Récupérer la progression du challenge lorsque currentChallenge change
+  useEffect(() => {
+    const fetchChallengeProgress = async () => {
+      if (!currentChallenge) {
+        setChallengeProgress(null);
+        return;
+      }
+
+      setIsLoadingProgress(true);
+      try {
+        const response = await fetch("/api/challenges/current/progress");
+        if (!response.ok) {
+          throw new Error("Erreur lors du chargement de la progression");
+        }
+
+        const data = await response.json();
+        setChallengeProgress(data);
+      } catch (error) {
+        console.error("Erreur:", error);
+        setChallengeProgress(null);
+      } finally {
+        setIsLoadingProgress(false);
+      }
+    };
+
+    fetchChallengeProgress();
+  }, [currentChallenge]);
+
   const renderFavoriteTypes = () => {
     if (!stats?.favoriteTypes) return "Aucune tâche ce mois-ci";
 
@@ -81,13 +120,6 @@ export default function StatsCard({
         )}
       </span>
     ));
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("fr-FR", {
-      day: "numeric",
-      month: "long",
-    });
   };
 
   return (
@@ -141,34 +173,102 @@ export default function StatsCard({
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-emerald-600"></div>
             </div>
           ) : currentChallenge ? (
-            <div className="space-y-2">
-              <h4 className="font-medium text-sage-800">
-                {currentChallenge.title}
-              </h4>
-              {currentChallenge.description && (
-                <p className="text-sm text-sage-600">
-                  {currentChallenge.description}
-                </p>
-              )}
-              <div className="text-xs text-sage-500 space-y-1">
-                <p>Objectif : {currentChallenge.goal}</p>
-                <p>Type : {currentChallenge.type}</p>
-                {currentChallenge.taskType && (
-                  <p>Type de tâche : {currentChallenge.taskType}</p>
-                )}
-                <p>
-                  Récompense :{" "}
-                  <span className="text-emerald-600">
-                    {currentChallenge.reward || "Aucune"}
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="text-emerald-600 flex-shrink-0 bg-emerald-100 p-2 rounded-full">
+                  {currentChallenge.type &&
+                    challengeTypeInfo[currentChallenge.type].icon}
+                </div>
+                <div>
+                  <h4 className="font-medium text-sage-800">
+                    {currentChallenge.type &&
+                      challengeTypeInfo[currentChallenge.type].title}
+                  </h4>
+                  {currentChallenge.description && (
+                    <p className="text-sm text-sage-600">
+                      {currentChallenge.description}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Barre de progression réelle */}
+              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                <div
+                  className="bg-emerald-500 h-2.5 rounded-full transition-all duration-500"
+                  style={{
+                    width: `${
+                      isLoadingProgress ? 0 : challengeProgress?.percentage || 0
+                    }%`,
+                  }}
+                ></div>
+              </div>
+              <p className="text-xs text-sage-500 text-right">
+                {isLoadingProgress ? (
+                  <span className="inline-block w-4 h-4">
+                    <span className="animate-pulse">...</span>
                   </span>
-                </p>
+                ) : (
+                  `Progression: ${challengeProgress?.progress || 0}/${
+                    challengeProgress?.total || currentChallenge.goal
+                  }`
+                )}
+              </p>
+
+              <div className="bg-white/50 rounded-lg p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-sage-600 flex items-center">
+                    <span className="inline-block w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1"></span>
+                    Objectif
+                  </span>
+                  <span className="text-sm font-medium text-sage-800">
+                    {currentChallenge.goal}{" "}
+                    {currentChallenge.type === ChallengeType.MONTHLY_TASKS
+                      ? "tâches"
+                      : currentChallenge.type === ChallengeType.STREAK_DAYS
+                      ? "jours"
+                      : ""}
+                  </span>
+                </div>
+
+                {currentChallenge.taskType && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-sage-600 flex items-center">
+                      <span className="inline-block w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1"></span>
+                      Type de tâche
+                    </span>
+                    <span
+                      className={`text-sm font-medium px-2 py-0.5 rounded-full ${
+                        getTaskTypeColor(currentChallenge.taskType).bg
+                      } ${getTaskTypeColor(currentChallenge.taskType).text}`}
+                    >
+                      {currentChallenge.taskType}
+                    </span>
+                  </div>
+                )}
+
+                {currentChallenge.reward && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-sage-600 flex items-center">
+                      <span className="inline-block w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1"></span>
+                      Récompense
+                    </span>
+                    <span className="text-sm font-medium text-emerald-600">
+                      {currentChallenge.reward}
+                    </span>
+                  </div>
+                )}
+
                 {currentChallenge.penalty && (
-                  <p>
-                    Pénalité :{" "}
-                    <span className="text-red-600">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-sage-600 flex items-center">
+                      <span className="inline-block w-1.5 h-1.5 bg-red-500 rounded-full mr-1"></span>
+                      Pénalité
+                    </span>
+                    <span className="text-sm font-medium text-red-600">
                       {currentChallenge.penalty}
                     </span>
-                  </p>
+                  </div>
                 )}
               </div>
             </div>

@@ -1,5 +1,10 @@
 import { ChallengeType } from "../types/enums";
-import { CalendarDaysIcon, FireIcon } from "@heroicons/react/24/outline";
+import {
+  CalendarDaysIcon,
+  FireIcon,
+  TrophyIcon,
+  ChartBarIcon,
+} from "@heroicons/react/24/outline";
 
 interface ChallengeTypeInfo {
   title: string;
@@ -27,13 +32,13 @@ export const challengeTypeInfo: Record<ChallengeType, ChallengeTypeInfo> = {
     title: "Mois parfait",
     description: "Accomplissez une tâche chaque jour du mois",
     example: "Ne manquez aucun jour ce mois-ci",
-    icon: "🏆",
+    icon: <TrophyIcon className="h-6 w-6" />,
   },
   [ChallengeType.TASK_TYPE_GOAL]: {
     title: "Objectif par type de tâche",
     description:
       "Accomplissez un certain nombre de tâches d'un type spécifique",
     example: "Ex: Accomplir 10 tâches de type Sport ce mois-ci",
-    icon: "📊",
+    icon: <ChartBarIcon className="h-6 w-6" />,
   },
 };
