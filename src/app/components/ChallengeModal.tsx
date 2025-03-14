@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { ChallengeType, TaskType } from "../types/enums";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import ChallengeTypeInfo from "./ChallengeTypeInfo";
+import { challengeTypeInfo } from "../utils/challengeTypeUtils";
 
 interface ChallengeModalProps {
   isOpen: boolean;
@@ -151,6 +152,8 @@ export default function ChallengeModal({
               <h2 className="text-2xl font-bold text-sage-800">
                 {step === 1
                   ? "Choisir un type de challenge"
+                  : type && challengeTypeInfo[type]
+                  ? `${challengeTypeInfo[type].title}`
                   : "Nouveau challenge"}
               </h2>
               <button
