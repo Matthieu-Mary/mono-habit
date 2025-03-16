@@ -163,15 +163,7 @@ export default function StatsCard({
             <span>Challenge du mois</span>
             {currentChallenge && (
               <span
-                className={`px-2 py-1 text-xs font-medium rounded-full ${
-                  currentChallenge.type === ChallengeType.MONTHLY_TASKS
-                    ? "bg-emerald-100 text-emerald-800"
-                    : currentChallenge.type === ChallengeType.STREAK_DAYS
-                    ? "bg-orange-100 text-orange-800"
-                    : currentChallenge.type === ChallengeType.PERFECT_MONTH
-                    ? "bg-amber-100 text-amber-800"
-                    : "bg-blue-100 text-blue-800"
-                }`}
+                className={`px-2 py-1 text-xs font-medium rounded-full bg-blue-400 text-white`}
               >
                 En cours
               </span>
@@ -294,7 +286,7 @@ export default function StatsCard({
                         backgroundPosition: ["100% 0%", "-100% 0%"],
                       }}
                       transition={{
-                        duration: 1.5,
+                        duration: 0.5,
                         repeat: Infinity,
                         ease: "linear",
                       }}

@@ -40,16 +40,6 @@ export const challengeTypeInfo: Record<ChallengeType, ChallengeTypeInfo> = {
     borderColor: "border-orange-300",
     iconColor: "text-orange-600",
   },
-  [ChallengeType.PERFECT_MONTH]: {
-    title: "Mois parfait",
-    description: "Accomplissez une tâche chaque jour du mois",
-    example: "Ne manquez aucun jour ce mois-ci",
-    icon: <TrophyIcon className="h-6 w-6" />,
-    bgColor: "bg-amber-100",
-    textColor: "text-amber-800",
-    borderColor: "border-amber-300",
-    iconColor: "text-amber-600",
-  },
   [ChallengeType.TASK_TYPE_GOAL]: {
     title: "Objectif par type de tâche",
     description:
@@ -60,5 +50,15 @@ export const challengeTypeInfo: Record<ChallengeType, ChallengeTypeInfo> = {
     textColor: "text-blue-800",
     borderColor: "border-blue-300",
     iconColor: "text-blue-600",
+  },
+  [ChallengeType.PERFECT_MONTH]: {
+    title: "Mois parfait",
+    description: "Accomplissez une tâche chaque jour du mois",
+    example: "Ne manquez aucun jour ce mois-ci",
+    icon: <TrophyIcon className="h-6 w-6" />,
+    bgColor: "bg-amber-100",
+    textColor: "text-amber-800",
+    borderColor: "border-amber-300",
+    iconColor: "text-amber-600",
   },
 };
