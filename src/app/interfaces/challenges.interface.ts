@@ -15,4 +15,17 @@ export interface Challenge {
     updatedAt: string;
     userId: string;
   }
+
+  export interface ChallengeProgress {
+    challenge: Challenge;
+    progress: number;
+    total: number;
+    percentage: number;
+  }
+  
+  export interface StatsCardProps {
+    onNewChallenge: () => void;
+    currentChallenge: Challenge | null;
+    isLoadingChallenge: boolean;
+  }
   

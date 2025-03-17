@@ -77,46 +77,57 @@ export async function GET() {
 
       progress = completedTasks;
     } else if (currentChallenge.type === ChallengeType.STREAK_DAYS) {
-      // Récupérer la série actuelle
-      const stats = await prisma.$queryRaw`
-        SELECT 
-          COALESCE(MAX(streak), 0) as "currentStreak"
-        FROM (
-          SELECT 
-            date,
-            SUM(CASE WHEN completed THEN 1 ELSE 0 END) as completed_count,
-            COUNT(*) as total_count,
-            CASE 
-              WHEN SUM(CASE WHEN completed THEN 1 ELSE 0 END) > 0 THEN 1 
-              ELSE 0 
-            END as day_completed,
-            COUNT(*) FILTER (WHERE date = CURRENT_DATE) as is_today,
-            SUM(CASE 
-              WHEN date = CURRENT_DATE AND completed THEN 1 
-              ELSE 0 
-            END) as completed_today
-          FROM "HabitLog"
-          WHERE "userId" = ${user.id}
-          GROUP BY date
-          ORDER BY date DESC
-        ) as daily_completions
-        CROSS JOIN LATERAL (
-          SELECT 
-            COUNT(*) as streak
-          FROM (
-            SELECT 
-              ROW_NUMBER() OVER (ORDER BY date DESC) as row_num,
-              date,
-              day_completed
-            FROM daily_completions
-            WHERE day_completed = 1 OR (is_today > 0 AND completed_today > 0)
-          ) as streak_calc
-          WHERE streak_calc.row_num = streak_calc.date - (CURRENT_DATE - streak_calc.row_num)::integer
-        ) as streak_count;
-      `;
+      // Récupérer tous les jours des 30 derniers jours
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - 30); // Regarder les 30 derniers jours
 
-      // @ts-ignore
-      progress = stats[0]?.currentStreak || 0;
+      // Récupérer les logs pour chaque jour
+      const habitLogs = await prisma.habitLog.findMany({
+        where: {
+          userId: user.id,
+          date: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+        orderBy: {
+          date: "desc",
+        },
+      });
+
+      // Regrouper par jour et vérifier si chaque jour a au moins une tâche complétée
+      const dailyCompletions = new Map();
+      habitLogs.forEach((log) => {
+        const dateStr = new Date(log.date).toISOString().split("T")[0];
+        if (!dailyCompletions.has(dateStr)) {
+          dailyCompletions.set(dateStr, false);
+        }
+        if (log.completed) {
+          dailyCompletions.set(dateStr, true);
+        }
+      });
+
+      // Calculer le streak actuel
+      let currentStreak = 0;
+      const today = new Date().toISOString().split("T")[0];
+
+      // Vérifier chaque jour en partant d'aujourd'hui
+      for (let i = 0; i < 30; i++) {
+        const checkDate = new Date();
+        checkDate.setDate(checkDate.getDate() - i);
+        const dateStr = checkDate.toISOString().split("T")[0];
+
+        // Si le jour a au moins une tâche complétée, incrémenter le streak
+        if (dailyCompletions.get(dateStr)) {
+          currentStreak++;
+        } else {
+          // Si un jour n'a pas de tâche complétée, arrêter le comptage
+          break;
+        }
+      }
+
+      progress = currentStreak;
     } else if (currentChallenge.type === ChallengeType.PERFECT_MONTH) {
       // Compter le nombre de jours avec des tâches complétées ce mois-ci
       const startOfMonth = new Date();

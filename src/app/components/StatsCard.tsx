@@ -2,55 +2,22 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { TaskType } from "../types/enums";
+import { TaskType, ChallengeType } from "../types/enums";
 import { getTaskTypeColor } from "../utils/taskTypeUtils";
-import { ChallengeStatus, ChallengeType } from "../types/enums";
 import { PlusIcon, TrophyIcon } from "@heroicons/react/24/outline";
 import { challengeTypeInfo } from "../utils/challengeTypeUtils";
-
-interface Stats {
-  successRate: number;
-  currentStreak: number;
-  bestStreak: number;
-  favoriteTypes: string[] | null;
-  month: string;
-}
-
-interface Challenge {
-  id: string;
-  title: string;
-  description: string | null;
-  type: ChallengeType;
-  goal: number;
-  reward: string;
-  penalty: string;
-  month: number;
-  status: ChallengeStatus;
-  taskType?: TaskType | null;
-  createdAt: string;
-  updatedAt: string;
-  userId: string;
-}
-
-interface ChallengeProgress {
-  challenge: Challenge;
-  progress: number;
-  total: number;
-  percentage: number;
-}
-
-interface StatsCardProps {
-  onNewChallenge: () => void;
-  currentChallenge: Challenge | null;
-  isLoadingChallenge: boolean;
-}
+import {
+  StatsCardProps,
+  ChallengeProgress,
+} from "../interfaces/challenges.interface";
+import { CurrentMonthStats } from "../interfaces/currentMonthStats.interface";
 
 export default function StatsCard({
   onNewChallenge,
   currentChallenge,
   isLoadingChallenge,
 }: StatsCardProps) {
-  const [stats, setStats] = useState<Stats | null>(null);
+  const [stats, setStats] = useState<CurrentMonthStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [challengeProgress, setChallengeProgress] =
     useState<ChallengeProgress | null>(null);
@@ -86,6 +53,7 @@ export default function StatsCard({
       setIsLoadingProgress(true);
       try {
         const response = await fetch("/api/challenges/current/progress");
+        console.log(response);
         if (!response.ok) {
           throw new Error("Erreur lors du chargement de la progression");
         }
