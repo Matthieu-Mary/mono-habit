@@ -110,7 +110,6 @@ export async function GET() {
 
       // Calculer le streak actuel
       let currentStreak = 0;
-      const today = new Date().toISOString().split("T")[0];
 
       // Vérifier chaque jour en partant d'aujourd'hui
       for (let i = 0; i < 30; i++) {
@@ -146,8 +145,10 @@ export async function GET() {
           AND date <= ${today}
       `;
 
-      // @ts-ignore
-      progress = daysWithCompletedTasks[0]?.days_count || 0;
+      // Ajouter un type explicite pour résoudre l'erreur
+      type DaysCountResult = { days_count: number }[];
+      progress =
+        (daysWithCompletedTasks as DaysCountResult)[0]?.days_count || 0;
 
       // Le total est le nombre de jours écoulés dans le mois
       total = today.getDate();
@@ -171,7 +172,7 @@ export async function GET() {
             lte: endOfMonth,
           },
           habit: {
-            type: currentChallenge.taskType,
+            type: currentChallenge.taskType || undefined,
           },
         },
       });
