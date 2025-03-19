@@ -16,6 +16,7 @@ export default function StatsCard({
   onNewChallenge,
   currentChallenge,
   isLoadingChallenge,
+  refreshTrigger = 0,
 }: StatsCardProps) {
   const [stats, setStats] = useState<CurrentMonthStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +27,7 @@ export default function StatsCard({
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        setIsLoading(true);
         const response = await fetch("/api/habits/stats");
         if (!response.ok)
           throw new Error("Erreur lors du chargement des stats");
@@ -40,9 +42,9 @@ export default function StatsCard({
     };
 
     fetchStats();
-  }, []);
+  }, [refreshTrigger]);
 
-  // Récupérer la progression du challenge lorsque currentChallenge change
+  // Récupérer la progression du challenge lorsque currentChallenge change ou refreshTrigger change
   useEffect(() => {
     const fetchChallengeProgress = async () => {
       if (!currentChallenge) {
@@ -53,7 +55,6 @@ export default function StatsCard({
       setIsLoadingProgress(true);
       try {
         const response = await fetch("/api/challenges/current/progress");
-        console.log(response);
         if (!response.ok) {
           throw new Error("Erreur lors du chargement de la progression");
         }
@@ -69,7 +70,7 @@ export default function StatsCard({
     };
 
     fetchChallengeProgress();
-  }, [currentChallenge]);
+  }, [currentChallenge, refreshTrigger]);
 
   const renderFavoriteTypes = () => {
     if (!stats?.favoriteTypes) return "Aucune tâche ce mois-ci";

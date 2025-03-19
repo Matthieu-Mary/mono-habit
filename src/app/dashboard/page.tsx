@@ -68,6 +68,21 @@ export default function DashboardPage() {
     null
   );
   const [isLoadingChallenge, setIsLoadingChallenge] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // Fonction pour récupérer les statistiques
+  const fetchStats = useCallback(async () => {
+    setIsLoadingStatus(true);
+    try {
+      const response = await fetch("/api/habits/stats");
+      if (!response.ok) throw new Error("Erreur lors du chargement des stats");
+      // Aucune action nécessaire ici car StatsCard fait son propre appel API
+    } catch (error) {
+      console.error("Erreur:", error);
+    } finally {
+      setIsLoadingStatus(false);
+    }
+  }, []);
 
   useEffect(() => {
     // Mettre à jour le temps restant seulement si la tâche n'est pas complétée
@@ -153,6 +168,11 @@ export default function DashboardPage() {
       setShowCelebration(true);
       await fetchTodayTask();
       await fetchMonthlyHabits();
+      await fetchStats();
+      await fetchCurrentChallenge();
+
+      // Force le rafraîchissement de StatsCard en incrémentant le trigger
+      setRefreshTrigger((prev) => prev + 1);
     } catch (error) {
       console.error("Erreur:", error);
     } finally {
@@ -363,6 +383,7 @@ export default function DashboardPage() {
             onNewChallenge={() => setIsChallengeModalOpen(true)}
             currentChallenge={currentChallenge}
             isLoadingChallenge={isLoadingChallenge}
+            refreshTrigger={refreshTrigger}
           />
         </div>
 
