@@ -29,6 +29,7 @@ export default function TaskDetailsModal({
     description: task?.description ?? "",
     type: task?.type ?? TaskType.LOISIRS,
   });
+  const [titleError, setTitleError] = useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -39,9 +40,31 @@ export default function TaskDetailsModal({
       description: task?.description ?? "",
       type: task?.type ?? TaskType.LOISIRS,
     });
+    setTitleError(null);
   }, [task]);
 
+  // Valider le titre
+  const validateTitle = (title: string) => {
+    if (title.length < 3) {
+      setTitleError("Le titre doit comporter au moins 3 caractères");
+      return false;
+    }
+    setTitleError(null);
+    return true;
+  };
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = e.target.value;
+    setFormData({ ...formData, title: newTitle });
+    validateTitle(newTitle);
+  };
+
   const handleScheduleTask = async () => {
+    // Validation avant soumission
+    if (!validateTitle(formData.title)) {
+      return;
+    }
+
     try {
       setIsLoading(true);
 
@@ -96,6 +119,9 @@ export default function TaskDetailsModal({
     return colorMap[status as keyof typeof colorMap] || "bg-gray-100";
   };
 
+  // Vérifier si le formulaire est valide
+  const isFormValid = formData.title.length >= 3;
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -131,20 +157,24 @@ export default function TaskDetailsModal({
               <div className="space-y-6">
                 <div>
                   <label className="block text-sage-700 mb-2" htmlFor="title">
-                    Titre
+                    Titre *
                   </label>
                   <motion.input
                     whileFocus={{ scale: 1.02 }}
                     type="text"
                     id="title"
                     value={formData.title}
-                    onChange={(e) =>
-                      setFormData({ ...formData, title: e.target.value })
-                    }
-                    className="w-full px-4 py-3 rounded-xl border border-sage-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
+                    onChange={handleTitleChange}
+                    className={`w-full px-4 py-3 rounded-xl border ${
+                      titleError ? "border-red-500" : "border-sage-200"
+                    } focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all`}
                     placeholder="Titre de la tâche"
                     required
+                    onBlur={() => validateTitle(formData.title)}
                   />
+                  {titleError && (
+                    <p className="mt-1 text-sm text-red-500">{titleError}</p>
+                  )}
                 </div>
 
                 <div>
@@ -197,11 +227,15 @@ export default function TaskDetailsModal({
 
                 <div className="flex gap-4 pt-4">
                   <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ scale: isFormValid ? 1.02 : 1 }}
+                    whileTap={{ scale: isFormValid ? 0.98 : 1 }}
                     onClick={handleScheduleTask}
-                    disabled={isLoading}
-                    className="flex-1 bg-emerald-500 text-white py-3 rounded-xl hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={isLoading || !isFormValid}
+                    className={`flex-1 bg-emerald-500 text-white py-3 rounded-xl transition-colors ${
+                      isFormValid
+                        ? "hover:bg-emerald-600"
+                        : "opacity-50 cursor-not-allowed bg-emerald-400"
+                    }`}
                   >
                     {isLoading ? (
                       <div className="flex items-center justify-center">
@@ -224,6 +258,7 @@ export default function TaskDetailsModal({
                           description: task?.description ?? "",
                           type: task?.type ?? TaskType.LOISIRS,
                         });
+                        setTitleError(null);
                       } else {
                         onClose();
                       }
