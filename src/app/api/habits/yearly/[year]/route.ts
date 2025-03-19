@@ -83,8 +83,9 @@ export async function GET(
       // Calculer les types de tâches favoris
       const typeCount = new Map<TaskType, number>();
       habits.forEach((habit) => {
-        const currentCount = typeCount.get(habit.type) || 0;
-        typeCount.set(habit.type, currentCount + 1);
+        const frontendType = habit.type as unknown as TaskType;
+        const currentCount = typeCount.get(frontendType) || 0;
+        typeCount.set(frontendType, currentCount + 1);
       });
 
       let maxCount = 0;
@@ -102,14 +103,11 @@ export async function GET(
       // Vérifier si le mois est parfait (toutes les tâches complétées)
       const isPerfect = completedTasks === totalDays;
 
-      // Récupérer le challenge pour ce mois
+      // Récupérer le challenge pour ce mois (corrigé pour utiliser le champ month au lieu de startDate)
       const challenge = await prisma.challenge.findFirst({
         where: {
           userId: session.user.id,
-          startDate: {
-            gte: new Date(year, month - 1, 1),
-            lt: new Date(year, month, 1),
-          },
+          month: month,
         },
         select: {
           title: true,

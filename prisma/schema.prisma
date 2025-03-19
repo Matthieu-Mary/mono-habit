@@ -14,7 +14,7 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// ----------------- enums ----------------------
+// ----------------- enums (doivent être les mêmes que ceux définis dans le fichier types/enums.ts) ----------------------
 
 enum Status {
   FUTURE_UNSCHEDULED
