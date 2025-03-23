@@ -75,7 +75,7 @@ export default function StatsCard({
   const renderFavoriteTypes = () => {
     if (!stats?.favoriteTypes) return "Aucune tâche ce mois-ci";
 
-    return stats.favoriteTypes.map((type, index) => (
+    return stats.favoriteTypes.map((type) => (
       <span
         key={type}
         className={`inline-flex items-center gap-1 px-2 py-1 rounded-full ${
@@ -84,9 +84,6 @@ export default function StatsCard({
       >
         <span>{getTaskTypeColor(type as TaskType).icon}</span>
         <span>{type}</span>
-        {index < stats.favoriteTypes!.length - 1 && (
-          <span className="mx-1 text-sage-400">•</span>
-        )}
       </span>
     ));
   };
@@ -97,7 +94,7 @@ export default function StatsCard({
       animate={{ opacity: 1, x: 0 }}
       className="bg-white rounded-2xl p-8 shadow-lg relative"
     >
-      <h2 className="text-2xl font-semibold text-sage-800 mb-6">Infos</h2>
+      <h2 className="text-2xl font-semibold text-sage-800 mb-6">Infos mois en cours</h2>
       <div className="space-y-6 h-full flex flex-col">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-sage-50 py-3 px-5 rounded-xl text-center sm:text-left h-full">

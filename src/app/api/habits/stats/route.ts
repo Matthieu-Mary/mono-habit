@@ -80,26 +80,130 @@ export async function GET() {
       let bestStreak = 0;
       let currentCount = 0;
 
-      const sortedLogs = monthHabits
+      // Trier les logs par date (du plus ancien au plus récent)
+      const chronologicalLogs = monthHabits
         .flatMap((h) => h.HabitLog)
-        .sort((a, b) => b.date.getTime() - a.date.getTime());
+        .sort((a, b) => a.date.getTime() - b.date.getTime());
 
-      // Série actuelle (seulement pour le mois en cours)
-      if (isCurrentMonth) {
-        let i = 0;
-        while (i < sortedLogs.length && sortedLogs[i].status === "COMPLETED") {
-          currentStreak++;
-          i++;
+      // Regrouper les logs par jour (puisqu'on ne peut avoir qu'une tâche par jour)
+      const logsByDay = new Map<string, boolean>();
+
+      for (const log of chronologicalLogs) {
+        const logDate = new Date(log.date);
+        logDate.setHours(0, 0, 0, 0);
+        const dateKey = logDate.toISOString().split("T")[0];
+
+        // Si un log pour ce jour est complété, on marque le jour comme complété
+        if (log.status === "COMPLETED") {
+          logsByDay.set(dateKey, true);
+        } else if (!logsByDay.has(dateKey)) {
+          // Si aucun log n'existe pour ce jour, on l'ajoute comme non complété
+          logsByDay.set(dateKey, false);
         }
       }
 
-      // Meilleure série
-      for (const log of sortedLogs) {
-        if (log.status === "COMPLETED") {
-          currentCount++;
-          bestStreak = Math.max(bestStreak, currentCount);
+      // Convertir la map en tableau trié par date
+      const sortedDays = Array.from(logsByDay.entries()).sort((a, b) =>
+        a[0].localeCompare(b[0])
+      );
+
+      // Calculer la meilleure série (bestStreak) pour ce mois
+      bestStreak = 0;
+
+      // Parcourir les jours triés et trouver la plus longue séquence consécutive
+      let currentSequence = 0;
+      let previousDate: Date | null = null;
+
+      for (const [dateKey, isCompleted] of sortedDays) {
+        if (isCompleted) {
+          const currentDate = new Date(dateKey);
+
+          // Si c'est le premier jour complété ou s'il suit immédiatement le jour précédent
+          if (previousDate === null) {
+            // Premier jour complété de la séquence
+            currentSequence = 1;
+            previousDate = currentDate;
+          } else {
+            // Calculer la différence en jours
+            const prevDay = new Date(previousDate);
+            prevDay.setDate(prevDay.getDate() + 1);
+
+            // Vérifier si ce jour suit immédiatement le jour précédent
+            if (
+              currentDate.toISOString().split("T")[0] ===
+              prevDay.toISOString().split("T")[0]
+            ) {
+              // Jour consécutif
+              currentSequence++;
+            } else {
+              // Jour non consécutif, on recommence une nouvelle séquence
+              currentSequence = 1;
+            }
+
+            previousDate = currentDate;
+          }
+
+          // Mettre à jour le record si nécessaire
+          bestStreak = Math.max(bestStreak, currentSequence);
         } else {
-          currentCount = 0;
+          // Jour non complété, on réinitialise la séquence
+          currentSequence = 0;
+          previousDate = null;
+        }
+      }
+
+      // Pour calculer la série actuelle (currentStreak) - seulement pour le mois en cours
+      if (isCurrentMonth) {
+        // Trier les jours du plus récent au plus ancien
+        const sortedDaysDesc = [...sortedDays].reverse();
+
+        currentStreak = 0;
+
+        // Vérifier si le jour le plus récent est aujourd'hui ou hier
+        const today = new Date();
+        const todayKey = today.toISOString().split("T")[0];
+
+        const yesterday = new Date();
+        yesterday.setDate(today.getDate() - 1);
+        const yesterdayKey = yesterday.toISOString().split("T")[0];
+
+        // On ne commence à compter que si le jour le plus récent complété est d'aujourd'hui ou d'hier
+        let canCountStreak = false;
+
+        for (const [dateKey, isCompleted] of sortedDaysDesc) {
+          if (!canCountStreak) {
+            // Chercher le premier jour complété qui est aujourd'hui ou hier
+            if (
+              isCompleted &&
+              (dateKey === todayKey || dateKey === yesterdayKey)
+            ) {
+              canCountStreak = true;
+              currentStreak = 1;
+              continue;
+            }
+          } else if (isCompleted) {
+            // Vérifier si ce jour est consécutif au précédent
+            const prevDateKey = sortedDaysDesc[currentStreak - 1][0];
+            const currentDate = new Date(dateKey);
+            const prevDate = new Date(prevDateKey);
+
+            // Le jour doit être exactement 1 jour avant le précédent
+            const expectedDate = new Date(prevDate);
+            expectedDate.setDate(prevDate.getDate() - 1);
+
+            if (
+              currentDate.toISOString().split("T")[0] ===
+              expectedDate.toISOString().split("T")[0]
+            ) {
+              currentStreak++;
+            } else {
+              // Jour non consécutif, on arrête le comptage
+              break;
+            }
+          } else {
+            // Jour non complété, on arrête le comptage
+            break;
+          }
         }
       }
 

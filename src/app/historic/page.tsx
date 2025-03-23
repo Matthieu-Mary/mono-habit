@@ -61,7 +61,7 @@ export default function Historic() {
   const renderFavoriteTypes = (types: TaskType[] | null) => {
     if (!types) return "Aucune tâche";
 
-    return types.map((type, index) => (
+    return types.map((type) => (
       <span
         key={type}
         className={`inline-flex items-center gap-1 px-2 py-1 rounded-full ${
@@ -70,9 +70,6 @@ export default function Historic() {
       >
         <span>{getTaskTypeColor(type).icon}</span>
         <span>{type}</span>
-        {index < types.length - 1 && (
-          <span className="mx-1 text-sage-400">•</span>
-        )}
       </span>
     ));
   };
