@@ -2,11 +2,14 @@
 
 import { motion } from "framer-motion";
 import Loader from "./Loader";
+import { TaskType } from "../types/enums";
+import { getTaskTypeColor } from "../utils/taskTypeUtils";
 
 interface Task {
   id?: string;
   title: string;
   description?: string;
+  type?: string;
 }
 
 export default function TaskCard({
@@ -20,6 +23,32 @@ export default function TaskCard({
   readonly isLoading: boolean;
   readonly onComplete: () => Promise<void>;
 }) {
+  // Convertir le type de string à TaskType enum pour l'utiliser avec getTaskTypeColor
+  const getTaskType = (type?: string): TaskType => {
+    if (!type) return TaskType.TRAVAIL; // Valeur par défaut
+
+    switch (type.toUpperCase()) {
+      case TaskType.SPORT:
+        return TaskType.SPORT;
+      case TaskType.SANTE:
+        return TaskType.SANTE;
+      case TaskType.TRAVAIL:
+        return TaskType.TRAVAIL;
+      case TaskType.LOISIRS:
+        return TaskType.LOISIRS;
+      default:
+        return TaskType.TRAVAIL;
+    }
+  };
+
+  // Formater le nom du type de tâche (première lettre majuscule, reste en minuscule)
+  const formatTaskType = (type?: string): string => {
+    if (!type) return "";
+
+    const formattedType = type.toLowerCase();
+    return formattedType.charAt(0).toUpperCase() + formattedType.slice(1);
+  };
+
   return (
     <div className="relative">
       {isLoading && (
@@ -65,7 +94,6 @@ export default function TaskCard({
         animate={{ opacity: 1, y: 0 }}
         className="h-60 bg-gradient-to-br from-emerald-50 to-sage-50 rounded-xl p-6 relative overflow-hidden"
       >
-        {/* Reste du code de la carte inchangé */}
         <div className="absolute -right-8 -top-8 w-24 h-24 bg-emerald-100 rounded-full opacity-50" />
         <div className="absolute -right-10 -bottom-10 w-32 h-32 bg-sage-200 rounded-full opacity-30" />
         <div className="absolute right-1 top-1 bg-emerald-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
@@ -80,8 +108,23 @@ export default function TaskCard({
               </h3>
             </div>
 
+            {task.type && (
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mt-1 mb-3 ${
+                  getTaskTypeColor(getTaskType(task.type)).bg
+                } ${getTaskTypeColor(getTaskType(task.type)).text}`}
+              >
+                <span className="mr-1">
+                  {getTaskTypeColor(getTaskType(task.type)).icon}
+                </span>
+                <span>{formatTaskType(task.type)}</span>
+              </motion.div>
+            )}
+
             {task.description && (
-              <p className="text-sage-600 text-sm line-clamp-3 mb-2 mt-4">
+              <p className="text-sage-600 text-sm line-clamp-3 mb-2 mt-2">
                 {task.description}
               </p>
             )}

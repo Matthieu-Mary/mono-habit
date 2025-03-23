@@ -76,7 +76,7 @@ export async function GET(
           currentStreak++;
           bestStreak = Math.max(bestStreak, currentStreak);
         } else {
-          currentStreak = 0;
+          currentStreak = 0; 
         }
       }
 

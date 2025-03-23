@@ -52,6 +52,7 @@ export default function DashboardPage() {
     id: string;
     title: string;
     description?: string;
+    type: string;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [timeRemaining, setTimeRemaining] = useState<string>("");
@@ -110,6 +111,7 @@ export default function DashboardPage() {
               id: data.habit.id,
               title: data.habit.name,
               description: data.habit.description,
+              type: data.habit.type,
             }
           : null
       );
@@ -359,7 +361,12 @@ export default function DashboardPage() {
               </div>
             ) : currentTask ? (
               <TaskCard
-                task={currentTask}
+                task={{
+                  id: currentTask.id,
+                  title: currentTask.title,
+                  description: currentTask.description,
+                  type: currentTask.type,
+                }}
                 isCompleted={isCompleted}
                 isLoading={isLoading}
                 onComplete={handleCompleteTask}

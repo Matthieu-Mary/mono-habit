@@ -65,7 +65,6 @@ export async function GET() {
 
     habitsByMonth.forEach((monthHabits, monthKey) => {
       const [year, month] = monthKey.split("-").map(Number);
-      const startOfMonth = new Date(year, month - 1, 1);
       const endOfMonth = new Date(year, month, 0);
       const isCurrentMonth = monthKey === currentMonthKey;
       const daysInMonth = isCurrentMonth ? now.getDate() : endOfMonth.getDate();
@@ -107,8 +106,8 @@ export async function GET() {
       // Calculer les types de tâches favoris
       const typeCount = new Map<TaskType, number>();
       monthHabits.forEach((habit) => {
-        const currentCount = typeCount.get(habit.type) || 0;
-        typeCount.set(habit.type, currentCount + 1);
+        const currentCount = typeCount.get(habit.type as TaskType) || 0;
+        typeCount.set(habit.type as TaskType, currentCount + 1);
       });
 
       let maxCount = 0;
