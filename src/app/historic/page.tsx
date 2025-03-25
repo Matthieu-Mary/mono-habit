@@ -3,8 +3,9 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Loader from "../components/Loader";
-import { TaskType } from "../types/enums";
+import { TaskType, ChallengeType } from "../types/enums";
 import { getTaskTypeColor } from "../utils/taskTypeUtils";
+import { challengeTypeInfo } from "../utils/challengeTypeUtils";
 
 interface MonthStats {
   month: number;
@@ -17,6 +18,9 @@ interface MonthStats {
   challenge?: {
     title: string;
     status: string;
+    type?: ChallengeType;
+    progress?: number;
+    goal?: number;
   } | null;
 }
 
@@ -192,29 +196,104 @@ export default function Historic() {
                     })()}
                   </div>
 
-                  {/* Nouvelle section pour les challenges - sans séparateur */}
-                  <div className="pt-1 flex items-center justify-between">
-                    <span className="text-sage-600 block">Challenge</span>
+                  {/* Affichage amélioré des challenges */}
+                  <div className="pt-1">
+                    <span className="text-sage-600 block mb-2">Challenge</span>
                     {monthStats.challenge ? (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-sage-800">
-                          {monthStats.challenge.title}
-                        </span>
-                        <span
-                          className={`text-xs px-2 py-1 rounded-full ${
-                            monthStats.challenge.status === "COMPLETED"
-                              ? "bg-green-100 text-green-800"
+                      <div
+                        className={`p-3 rounded-lg ${
+                          monthStats.challenge.type &&
+                          challengeTypeInfo[monthStats.challenge.type]
+                            ? `${
+                                challengeTypeInfo[monthStats.challenge.type]
+                                  .bgColor
+                              } ${
+                                challengeTypeInfo[monthStats.challenge.type]
+                                  .textColor
+                              } border ${
+                                challengeTypeInfo[monthStats.challenge.type]
+                                  .borderColor
+                              }`
+                            : "bg-sage-100"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          {monthStats.challenge.type && (
+                            <div
+                              className={`p-1.5 rounded-full bg-white/80 ${
+                                challengeTypeInfo[monthStats.challenge.type]
+                                  .iconColor
+                              }`}
+                            >
+                              {
+                                challengeTypeInfo[monthStats.challenge.type]
+                                  .icon
+                              }
+                            </div>
+                          )}
+                          <div className="flex-1">
+                            <h4 className="text-sm font-medium">
+                              {monthStats.challenge.title ||
+                                (monthStats.challenge.type &&
+                                  challengeTypeInfo[monthStats.challenge.type]
+                                    .title)}
+                            </h4>
+                          </div>
+                          <div
+                            className={`px-2 py-1 text-xs font-medium rounded-full ${
+                              monthStats.challenge.status === "COMPLETED"
+                                ? "bg-green-500 text-white"
+                                : monthStats.challenge.status === "FAILED"
+                                ? "bg-red-500 text-white"
+                                : ""
+                            }`}
+                          >
+                            {monthStats.challenge.status === "COMPLETED"
+                              ? "Réussi"
                               : monthStats.challenge.status === "FAILED"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-blue-100 text-blue-800"
-                          }`}
-                        >
-                          {monthStats.challenge.status === "COMPLETED"
-                            ? "Réussi"
-                            : monthStats.challenge.status === "FAILED"
-                            ? "Échoué"
-                            : "En cours"}
-                        </span>
+                              ? "Échoué"
+                              : ""}
+                          </div>
+                        </div>
+
+                        {/* Barre de progression si des données de progression sont disponibles */}
+                        {monthStats.challenge.progress !== undefined &&
+                          monthStats.challenge.goal !== undefined && (
+                            <div className="mt-2">
+                              <div className="w-full bg-gray-200 rounded-full h-1.5 mb-1">
+                                <div
+                                  className={`h-1.5 rounded-full transition-all duration-500 ${
+                                    monthStats.challenge.type ===
+                                    ChallengeType.MONTHLY_TASKS
+                                      ? "bg-emerald-500"
+                                      : monthStats.challenge.type ===
+                                        ChallengeType.STREAK_DAYS
+                                      ? "bg-orange-500"
+                                      : monthStats.challenge.type ===
+                                        ChallengeType.PERFECT_MONTH
+                                      ? "bg-gradient-to-r from-amber-400 to-yellow-500 relative"
+                                      : "bg-blue-500"
+                                  }`}
+                                  style={{
+                                    width: `${
+                                      (monthStats.challenge.progress /
+                                        monthStats.challenge.goal) *
+                                      100
+                                    }%`,
+                                  }}
+                                >
+                                  {monthStats.challenge.type ===
+                                    ChallengeType.PERFECT_MONTH && (
+                                    <div className="absolute inset-0 w-full h-full bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent)]"></div>
+                                  )}
+                                </div>
+                              </div>
+                              <p className="text-xs text-right opacity-80">
+                                {monthStats.challenge.progress}/
+                                {monthStats.challenge.goal}
+                              </p>
+                            </div>
+                          )}
                       </div>
                     ) : (
                       <span className="text-sm text-sage-500 italic">

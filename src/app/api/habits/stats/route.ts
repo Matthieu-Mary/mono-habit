@@ -78,7 +78,6 @@ export async function GET() {
       // Calculer les séries
       let currentStreak = 0;
       let bestStreak = 0;
-      let currentCount = 0;
 
       // Trier les logs par date (du plus ancien au plus récent)
       const chronologicalLogs = monthHabits
