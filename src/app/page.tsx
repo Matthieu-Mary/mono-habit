@@ -95,17 +95,29 @@ export default function Home() {
         },
       });
 
-      gsap.from(statsRef.current, {
-        x: -50,
-        opacity: 0,
-        duration: 0.8,
-        scrollTrigger: {
-          trigger: statsRef.current,
-          start: "top 80%",
-          end: "top 50%",
-          scrub: 1,
+      // Animation de la div des statistiques avec effet de disparition/apparition horizontale
+      gsap.fromTo(
+        statsRef.current,
+        {
+          x: 0,
+          opacity: 1,
+          rotateY: 0,
         },
-      });
+        {
+          x: 100,
+          opacity: 0,
+          rotateY: -15,
+          duration: 1,
+          ease: "power2.inOut",
+          scrollTrigger: {
+            trigger: statsRef.current,
+            start: "top 70%",
+            end: "top 30%",
+            scrub: true,
+            toggleActions: "play reverse play reverse", // rejouer l'animation en sens inverse quand on remonte
+          },
+        }
+      );
 
       // Animation des cartes de témoignages
       gsap.utils
@@ -148,7 +160,7 @@ export default function Home() {
         <div className="max-w-4xl text-center space-y-8 z-10">
           <h1
             ref={headingRef}
-            className="text-5xl md:text-7xl font-bold text-sage-800 mb-4 tracking-tight"
+            className="text-5xl md:text-7xl font-bold text-sage-800 mb-4 mt-4 tracking-tight"
           >
             <span className="block">Une habitude à la fois.</span>
             <span className="text-emerald-600">Un potentiel infini.</span>
@@ -428,7 +440,7 @@ export default function Home() {
             </button>
           </div>
           {/* Livre Atomic Habits (Image et lien vers Amazon) */}
-          <div className="md:w-1/2 flex justify-center">
+          <div className="md:w-1/2 flex justify-center cursor-pointer">
             <div className="relative w-64 h-96 md:w-80 md:h-[30rem] shadow-2xl transform rotate-3 transition-all hover:rotate-0 overflow-hidden rounded-lg">
               <div
                 className="absolute inset-0 bg-cover bg-center"
