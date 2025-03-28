@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useLayoutEffect, useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Image from "next/image";
+import Header from "./components/Header";
 
 export default function Home() {
   const router = useRouter();
@@ -108,18 +108,20 @@ export default function Home() {
       });
 
       // Animation des cartes de témoignages
-      gsap.utils.toArray(".testimonial-card").forEach((card, i) => {
-        gsap.from(card, {
-          y: 50,
-          opacity: 0,
-          duration: 0.8,
-          delay: 0.2 * i,
-          scrollTrigger: {
-            trigger: testimonialsRef.current,
-            start: "top 70%",
-          },
+      gsap.utils
+        .toArray<HTMLElement>(".testimonial-card")
+        .forEach((card, i) => {
+          gsap.from(card, {
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            delay: 0.2 * i,
+            scrollTrigger: {
+              trigger: testimonialsRef.current,
+              start: "top 70%",
+            },
+          });
         });
-      });
     }, mainRef);
 
     return () => ctx.revert(); // Nettoyage des animations
@@ -134,10 +136,12 @@ export default function Home() {
       ref={mainRef}
       className="min-h-screen bg-gradient-to-b from-sage-50 to-sage-100 overflow-x-hidden"
     >
+      <Header />
+
       {/* Hero Section */}
       <section
         ref={heroRef}
-        className="min-h-screen flex flex-col items-center justify-center p-8 relative"
+        className="min-h-screen flex flex-col items-center justify-center p-8 pt-28 relative"
       >
         <div className="absolute inset-0 bg-[url('/images/pattern.svg')] opacity-5"></div>
 
@@ -173,7 +177,9 @@ export default function Home() {
                 <div className="text-emerald-600 text-5xl font-bold mb-1">
                   1%
                 </div>
-                <div className="text-sage-700">d&apos;amélioration par jour</div>
+                <div className="text-sage-700">
+                  d&apos;amélioration par jour
+                </div>
               </div>
               <div className="hidden md:block h-16 w-px bg-sage-200"></div>
               <div className="text-center">
@@ -287,8 +293,8 @@ export default function Home() {
               </h3>
               <p className="text-sage-700">
                 Visualisez vos progrès quotidiens et profitez d&apos;une
-                motivation constante. Chaque petit pas compte et s&apos;additionne
-                exponentiellement.
+                motivation constante. Chaque petit pas compte et
+                s&apos;additionne exponentiellement.
               </p>
             </div>
           </div>
@@ -340,8 +346,8 @@ export default function Home() {
               <p className="text-sage-700 italic">
                 &quot;Avant MonoHabit, j&apos;essayais de tout changer en même
                 temps et j&apos;échouais systématiquement. Aujourd&apos;hui,
-                après 6 mois à développer une habitude à la fois, ma productivité
-                a augmenté de 40% et mon niveau de stress a diminué
+                après 6 mois à développer une habitude à la fois, ma
+                productivité a augmenté de 40% et mon niveau de stress a diminué
                 considérablement.&quot;
               </p>
             </div>
