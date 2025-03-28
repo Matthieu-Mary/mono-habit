@@ -2,6 +2,7 @@
 import { useLayoutEffect, useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface Particle {
   x: number;
@@ -23,6 +24,9 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const particlesRef = useRef<Particle[]>([]);
   const animationRef = useRef<number | null>(null);
+
+  const pathname = usePathname();
+  const isAuthPage = pathname?.includes("/auth/");
 
   // Initialisation des particules
   useEffect(() => {
@@ -239,38 +243,40 @@ export default function Header() {
         </Link>
 
         <div ref={navRef} className="flex items-center space-x-6">
-          <Link
-            href="/auth/login"
-            className={`relative overflow-hidden rounded-full px-6 py-2 text-white font-semibold group transition-all duration-300 ${
-              isScrolled ? "bg-emerald-500" : "bg-emerald-600"
-            }`}
-          >
-            <span className="relative z-10">Commencer</span>
-            <span className="absolute inset-0 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-700 ease-out">
-              <svg
-                className="h-full w-full"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 100 100"
-                preserveAspectRatio="none"
-              >
-                <path
-                  className="fill-emerald-400"
-                  d="M0,0 L0,100 L100,100 L100,0 Q60,45 30,20 Q15,5 0,20 Z"
+          {!isAuthPage && (
+            <Link
+              href="/auth/login"
+              className={`relative overflow-hidden rounded-full px-6 py-2 text-white font-semibold group transition-all duration-300 ${
+                isScrolled ? "bg-emerald-500" : "bg-emerald-600"
+              }`}
+            >
+              <span className="relative z-10">Commencer</span>
+              <span className="absolute inset-0 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-700 ease-out">
+                <svg
+                  className="h-full w-full"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="none"
                 >
-                  <animate
-                    attributeName="d"
-                    dur="0.7s"
-                    fill="freeze"
-                    values="
-                      M0,0 L0,100 L100,100 L100,0 Q60,45 30,20 Q15,5 0,20 Z;
-                      M0,0 L0,100 L100,100 L100,0 Q60,15 30,40 Q15,65 0,40 Z;
-                      M0,0 L0,100 L100,100 L100,0 L0,0 Z
-                    "
-                  />
-                </path>
-              </svg>
-            </span>
-          </Link>
+                  <path
+                    className="fill-emerald-400"
+                    d="M0,0 L0,100 L100,100 L100,0 Q60,45 30,20 Q15,5 0,20 Z"
+                  >
+                    <animate
+                      attributeName="d"
+                      dur="0.7s"
+                      fill="freeze"
+                      values="
+                        M0,0 L0,100 L100,100 L100,0 Q60,45 30,20 Q15,5 0,20 Z;
+                        M0,0 L0,100 L100,100 L100,0 Q60,15 30,40 Q15,65 0,40 Z;
+                        M0,0 L0,100 L100,100 L100,0 L0,0 Z
+                      "
+                    />
+                  </path>
+                </svg>
+              </span>
+            </Link>
+          )}
         </div>
       </div>
     </header>

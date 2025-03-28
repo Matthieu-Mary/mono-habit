@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Header from "src/app/components/Header";
 
 export default function Register() {
   const router = useRouter();
@@ -44,6 +45,7 @@ export default function Register() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-sage-50 to-sage-100 flex flex-col items-center justify-center p-8">
+      <Header />
       <div className="max-w-md w-full bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg">
         <h1 className="text-3xl font-bold text-sage-800 text-center mb-8">
           Rejoindre <span className="text-emerald-600">MonoHabit</span>
@@ -52,7 +54,9 @@ export default function Register() {
         <form onSubmit={handleRegister} className="space-y-6">
           {error && (
             <div className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-md p-3">
-              {"Une erreur est survenue lors de l'inscription, assurez-vous que votre email ou nom d'utilisateur ne sont pas déjà utilisés"}
+              {
+                "Une erreur est survenue lors de l'inscription, assurez-vous que votre email ou nom d'utilisateur ne sont pas déjà utilisés"
+              }
             </div>
           )}
 

@@ -2,6 +2,7 @@
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Header from "src/app/components/Header";
 
 export default function Login() {
   const router = useRouter();
@@ -39,6 +40,7 @@ export default function Login() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-sage-50 to-sage-100 flex flex-col items-center justify-center p-8">
+      <Header />
       <div className="max-w-md w-full bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg">
         <h1 className="text-3xl font-bold text-sage-800 text-center mb-8">
           Connexion à <span className="text-emerald-600">MonoHabit</span>
