@@ -427,32 +427,14 @@ export default function Home() {
               Commencez aujourd&apos;hui
             </button>
           </div>
+          {/* Livre Atomic Habits (Image et lien vers Amazon) */}
           <div className="md:w-1/2 flex justify-center">
-            <div className="relative w-64 h-96 md:w-80 md:h-[30rem] shadow-2xl transform rotate-3 transition-all hover:rotate-0">
-              <div className="absolute inset-0 bg-emerald-600 rounded-lg overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 to-emerald-700 opacity-80"></div>
-                <div className="absolute inset-0 p-8 flex flex-col justify-between">
-                  <div>
-                    <h3 className="text-white text-3xl font-bold mb-2">
-                      ATOMIC HABITS
-                    </h3>
-                    <p className="text-white/90 text-lg">
-                      An Easy & Proven Way to Build Good Habits & Break Bad Ones
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-white/90 text-right text-xl font-semibold">
-                      James Clear
-                    </p>
-                    <p className="text-white/70 text-right">
-                      #1 New York Times Bestseller
-                    </p>
-                  </div>
-                </div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full border-4 border-white/30"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full border-4 border-white/50"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border-4 border-white/70"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white"></div>
+            <div className="relative w-64 h-96 md:w-80 md:h-[30rem] shadow-2xl transform rotate-3 transition-all hover:rotate-0 overflow-hidden rounded-lg">
+              <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{ backgroundImage: "url('/images/atomic-habits.jpg')" }}
+              >
+                <div className="absolute inset-0 bg-emerald-300/30 backdrop-brightness-75"></div>
               </div>
             </div>
           </div>
