@@ -516,9 +516,8 @@ export default function Home() {
                 Suivi quotidien intelligent
               </h3>
               <p className="text-sage-700">
-                Visualisez vos progrès en temps réel avec notre barre de
-                progression dynamique et recevez des rappels personnalisés pour
-                rester sur la bonne voie.
+                Visualisez vos progrès en temps réel avec un suivi simple et
+                intuitif pour rester sur la bonne voie.
               </p>
             </div>
 
@@ -545,7 +544,7 @@ export default function Home() {
               <p className="text-sage-700">
                 Relevez des défis quotidiens et hebdomadaires qui vous poussent
                 à maintenir votre habitude. Dépassez-vous et célébrez chaque
-                victoire avec des animations festives.
+                victoire.
               </p>
             </div>
 
