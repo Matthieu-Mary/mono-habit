@@ -328,7 +328,7 @@ export default function StatsCard({
                       <span
                         className={`inline-block w-1.5 h-1.5 rounded-full mr-1 ${
                           currentChallenge.type === ChallengeType.TASK_TYPE_GOAL
-                            ? "bg-blue-500"
+                            ? "bg-yellow-500"
                             : currentChallenge.type &&
                               challengeTypeInfo[currentChallenge.type].iconColor
                         }`}
