@@ -245,6 +245,11 @@ export default function MonthlyProgress({
               </span>
             </div>
 
+            {/* Pastille pour indiquer le jour courant */}
+            {toLocalDateString(day.date) === toLocalDateString(now) && (
+              <div className="absolute top-1 right-1 w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+            )}
+
             {/* Tooltip au survol */}
             <div
               className="

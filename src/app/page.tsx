@@ -474,14 +474,14 @@ export default function Home() {
                 className="absolute inset-0 bg-cover bg-center"
                 style={{ backgroundImage: "url('/images/atomic-habits.jpg')" }}
               >
-                <div className="absolute inset-0 bg-emerald-300/30 backdrop-brightness-75"></div>
+                <div className="absolute inset-0"></div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Nouvelle section de fonctionnalités */}
+      {/* Section sur les fonctionnalités */}
       <section ref={featuresRef} className="py-24 px-8 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center text-sage-800 mb-6">
