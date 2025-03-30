@@ -248,8 +248,105 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Section sur les fonctionnalités */}
+      <section ref={featuresRef} className="py-24 px-8">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-center text-sage-800 mb-6">
+            Fonctionnalités <span className="text-emerald-600">puissantes</span>{" "}
+            pour transformer vos habitudes
+          </h2>
+          <p className="text-xl text-sage-700 text-center max-w-4xl mx-auto mb-16">
+            MonoHabit combine science comportementale et technologie pour vous
+            aider à développer des habitudes durables et à atteindre vos
+            objectifs avec constance.
+          </p>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="feature-card bg-sage-50 rounded-xl p-8 shadow-lg hover:shadow-xl transition-all border-t-4 border-emerald-500">
+              <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-6">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-8 w-8 text-emerald-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-sage-800 mb-3">
+                Suivi quotidien intelligent
+              </h3>
+              <p className="text-sage-700">
+                Visualisez vos progrès en temps réel avec un suivi simple et
+                intuitif pour rester sur la bonne voie.
+              </p>
+            </div>
+
+            <div className="feature-card bg-sage-50 rounded-xl p-8 shadow-lg hover:shadow-xl transition-all border-t-4 border-emerald-500">
+              <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-6">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-8 w-8 text-emerald-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-sage-800 mb-3">
+                Défis motivants
+              </h3>
+              <p className="text-sage-700">
+                Relevez des défis quotidiens et hebdomadaires qui vous poussent
+                à maintenir votre habitude. Dépassez-vous et célébrez chaque
+                victoire.
+              </p>
+            </div>
+
+            <div className="feature-card bg-sage-50 rounded-xl p-8 shadow-lg hover:shadow-xl transition-all border-t-4 border-emerald-500">
+              <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-6">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-8 w-8 text-emerald-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-sage-800 mb-3">
+                Analytiques personnelles
+              </h3>
+              <p className="text-sage-700">
+                Suivez vos performances à long terme avec des statistiques
+                claires et des visualisations de données qui montrent
+                l&apos;impact cumulatif de votre habitude quotidienne.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Benefits Section */}
-      <section ref={benefitsRef} className="py-20 px-8">
+      <section ref={benefitsRef} className="py-20 px-8 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center text-sage-800 mb-16">
             Pourquoi se concentrer sur{" "}
@@ -357,9 +454,9 @@ export default function Home() {
                 </div>
                 <div>
                   <h4 className="text-lg font-semibold text-sage-800">
-                    Sophie, 34 ans
+                    Anthony, 31 ans
                   </h4>
-                  <p className="text-sage-600">Designer</p>
+                  <p className="text-sage-600">Solution Designer</p>
                 </div>
               </div>
               <p className="text-sage-700 italic">
@@ -476,103 +573,6 @@ export default function Home() {
               >
                 <div className="absolute inset-0"></div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Section sur les fonctionnalités */}
-      <section ref={featuresRef} className="py-24 px-8 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center text-sage-800 mb-6">
-            Fonctionnalités <span className="text-emerald-600">puissantes</span>{" "}
-            pour transformer vos habitudes
-          </h2>
-          <p className="text-xl text-sage-700 text-center max-w-4xl mx-auto mb-16">
-            MonoHabit combine science comportementale et technologie pour vous
-            aider à développer des habitudes durables et à atteindre vos
-            objectifs avec constance.
-          </p>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="feature-card bg-sage-50 rounded-xl p-8 shadow-lg hover:shadow-xl transition-all border-t-4 border-emerald-500">
-              <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-6">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8 text-emerald-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-sage-800 mb-3">
-                Suivi quotidien intelligent
-              </h3>
-              <p className="text-sage-700">
-                Visualisez vos progrès en temps réel avec un suivi simple et
-                intuitif pour rester sur la bonne voie.
-              </p>
-            </div>
-
-            <div className="feature-card bg-sage-50 rounded-xl p-8 shadow-lg hover:shadow-xl transition-all border-t-4 border-emerald-500">
-              <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-6">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8 text-emerald-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-sage-800 mb-3">
-                Défis motivants
-              </h3>
-              <p className="text-sage-700">
-                Relevez des défis quotidiens et hebdomadaires qui vous poussent
-                à maintenir votre habitude. Dépassez-vous et célébrez chaque
-                victoire.
-              </p>
-            </div>
-
-            <div className="feature-card bg-sage-50 rounded-xl p-8 shadow-lg hover:shadow-xl transition-all border-t-4 border-emerald-500">
-              <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-6">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8 text-emerald-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-sage-800 mb-3">
-                Analytiques personnelles
-              </h3>
-              <p className="text-sage-700">
-                Suivez vos performances à long terme avec des statistiques
-                claires et des visualisations de données qui montrent
-                l&apos;impact cumulatif de votre habitude quotidienne.
-              </p>
             </div>
           </div>
         </div>
