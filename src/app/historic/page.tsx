@@ -16,11 +16,12 @@ interface MonthStats {
   isPerfect: boolean;
   favoriteTypes: TaskType[] | null;
   challenge?: {
-    title: string;
     status: string;
-    type?: ChallengeType;
-    progress?: number;
-    goal?: number;
+    type: ChallengeType;
+    progress: number;
+    goal: number;
+    reward: string | null;
+    penalty: string | null;
   } | null;
 }
 
@@ -232,7 +233,7 @@ export default function Historic() {
                             </div>
                           )}
                           <div className="flex-1">
-                            <h4 className="text-sm font-medium ml-2">
+                            <h4 className="text-sm font-medium ml-1">
                               {monthStats.challenge.type &&
                                 challengeTypeInfo[monthStats.challenge.type]
                                   .title}
@@ -293,6 +294,34 @@ export default function Historic() {
                               </p>
                             </div>
                           )}
+
+                        {/* Affichage des informations supplémentaires (goal, reward, penalty) */}
+                        <div className="mt-3 space-y-1 text-xs">
+                          {monthStats.challenge.goal !== undefined && (
+                            <div className="flex justify-between">
+                              <span className="font-medium">Objectif:</span>
+                              <span>{monthStats.challenge.goal}</span>
+                            </div>
+                          )}
+                          {monthStats.challenge.reward &&
+                            monthStats.challenge.reward.trim() !== "" && (
+                              <div className="flex justify-between">
+                                <span className="font-medium">Récompense:</span>
+                                <span className="text-green-600">
+                                  {monthStats.challenge.reward}
+                                </span>
+                              </div>
+                            )}
+                          {monthStats.challenge.penalty &&
+                            monthStats.challenge.penalty.trim() !== "" && (
+                              <div className="flex justify-between">
+                                <span className="font-medium">Pénalité:</span>
+                                <span className="text-red-600">
+                                  {monthStats.challenge.penalty}
+                                </span>
+                              </div>
+                            )}
+                        </div>
                       </div>
                     ) : (
                       <span className="text-sm text-sage-500 italic">

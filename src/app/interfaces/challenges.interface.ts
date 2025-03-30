@@ -3,11 +3,10 @@ import { ChallengeStatus, ChallengeType, TaskType } from "../types/enums";
 export interface Challenge {
   id: string;
   title: string;
-  description: string | null;
   type: ChallengeType;
   goal: number;
-  reward: string;
-  penalty: string;
+  reward: string | null;
+  penalty: string | null;
   month: number;
   status: ChallengeStatus;
   taskType?: TaskType | null;
