@@ -232,11 +232,10 @@ export default function Historic() {
                             </div>
                           )}
                           <div className="flex-1">
-                            <h4 className="text-sm font-medium">
-                              {monthStats.challenge.title ||
-                                (monthStats.challenge.type &&
-                                  challengeTypeInfo[monthStats.challenge.type]
-                                    .title)}
+                            <h4 className="text-sm font-medium ml-2">
+                              {monthStats.challenge.type &&
+                                challengeTypeInfo[monthStats.challenge.type]
+                                  .title}
                             </h4>
                           </div>
                           <div

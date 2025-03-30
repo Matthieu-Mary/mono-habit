@@ -76,7 +76,7 @@ export async function GET(
           currentStreak++;
           bestStreak = Math.max(bestStreak, currentStreak);
         } else {
-          currentStreak = 0; 
+          currentStreak = 0;
         }
       }
 
@@ -110,8 +110,13 @@ export async function GET(
           month: month,
         },
         select: {
-          title: true,
           status: true,
+          type: true,
+          goal: true,
+          reward: true,
+          penalty: true,
+          // A afficher sueulement si type === TASK_TYPE_GOAL
+          taskType: true,
         },
       });
 
