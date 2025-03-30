@@ -60,7 +60,6 @@ model User {
   sessions      Session[]
   habits        Habit[]
   habitLogs     HabitLog[]
-  challenges    Challenge[]
 }
 
 // Sert à enregistrer les habitudes (ex: manger une pomme, lire un livre, etc.)
@@ -103,7 +102,6 @@ model HabitLog {
 model Challenge {
   id          String          @id @default(cuid())
   title       String
-  description String?
   type        ChallengeType
   goal        Int
   reward      String?
