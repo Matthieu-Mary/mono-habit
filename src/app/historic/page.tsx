@@ -103,7 +103,7 @@ export default function Historic() {
       </header>
 
       {/* Grille des mois */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 mt-8">
         {monthNames.map((monthName, index) => {
           const monthStats = yearStats.find(
             (stat) => stat.month === index + 1
@@ -187,7 +187,7 @@ export default function Historic() {
 
                       return (
                         <div
-                          className={`flex flex-wrap gap-2 ${
+                          className={`flex justify-end flex-wrap gap-2 ${
                             isNoTask ? "text-sm text-sage-500 italic" : ""
                           }`}
                         >
@@ -203,8 +203,12 @@ export default function Historic() {
                     {monthStats.challenge ? (
                       <div
                         className={`p-3 rounded-lg ${
-                          monthStats.challenge.type &&
-                          challengeTypeInfo[monthStats.challenge.type]
+                          monthStats.challenge.status === "COMPLETED"
+                            ? "bg-green-100 text-green-800 border border-green-300"
+                            : monthStats.challenge.status === "FAILED"
+                            ? "bg-red-100 text-red-800 border border-red-300"
+                            : monthStats.challenge.type &&
+                              challengeTypeInfo[monthStats.challenge.type]
                             ? `${
                                 challengeTypeInfo[monthStats.challenge.type]
                                   .bgColor
@@ -222,8 +226,12 @@ export default function Historic() {
                           {monthStats.challenge.type && (
                             <div
                               className={`p-1.5 rounded-full bg-white/80 ${
-                                challengeTypeInfo[monthStats.challenge.type]
-                                  .iconColor
+                                monthStats.challenge.status === "COMPLETED"
+                                  ? "text-green-600"
+                                  : monthStats.challenge.status === "FAILED"
+                                  ? "text-red-600"
+                                  : challengeTypeInfo[monthStats.challenge.type]
+                                      .iconColor
                               }`}
                             >
                               {
@@ -245,14 +253,14 @@ export default function Historic() {
                                 ? "bg-green-500 text-white"
                                 : monthStats.challenge.status === "FAILED"
                                 ? "bg-red-500 text-white"
-                                : ""
+                                : "bg-blue-500 text-white"
                             }`}
                           >
                             {monthStats.challenge.status === "COMPLETED"
                               ? "Réussi"
                               : monthStats.challenge.status === "FAILED"
                               ? "Échoué"
-                              : ""}
+                              : "Actif"}
                           </div>
                         </div>
 
@@ -294,39 +302,11 @@ export default function Historic() {
                               </p>
                             </div>
                           )}
-
-                        {/* Affichage des informations supplémentaires (goal, reward, penalty) */}
-                        <div className="mt-3 space-y-1 text-xs">
-                          {monthStats.challenge.goal !== undefined && (
-                            <div className="flex justify-between">
-                              <span className="font-medium">Objectif:</span>
-                              <span>{monthStats.challenge.goal}</span>
-                            </div>
-                          )}
-                          {monthStats.challenge.reward &&
-                            monthStats.challenge.reward.trim() !== "" && (
-                              <div className="flex justify-between">
-                                <span className="font-medium">Récompense:</span>
-                                <span className="text-green-600">
-                                  {monthStats.challenge.reward}
-                                </span>
-                              </div>
-                            )}
-                          {monthStats.challenge.penalty &&
-                            monthStats.challenge.penalty.trim() !== "" && (
-                              <div className="flex justify-between">
-                                <span className="font-medium">Pénalité:</span>
-                                <span className="text-red-600">
-                                  {monthStats.challenge.penalty}
-                                </span>
-                              </div>
-                            )}
-                        </div>
                       </div>
                     ) : (
-                      <span className="text-sm text-sage-500 italic">
+                      <div className="text-sm text-sage-500 italic p-3 rounded-lg bg-sage-100 flex justify-center items-center text-sage-800">
                         Aucun challenge
-                      </span>
+                      </div>
                     )}
                   </div>
 
