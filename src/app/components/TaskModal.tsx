@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { TaskType } from "../types/enums";
+import { getTaskTypeColor } from "../utils/taskTypeUtils";
 
 export interface TaskModalProps {
   isOpen: boolean;
@@ -101,7 +102,7 @@ export default function TaskModal({
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sage-700 mb-2" htmlFor="title">
-                  Titre
+                  Titre *
                 </label>
                 <motion.input
                   whileFocus={{ scale: 1.02 }}
@@ -149,10 +150,17 @@ export default function TaskModal({
                   }
                   className="w-full px-4 py-3 rounded-xl border border-sage-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
                 >
-                  <option value={TaskType.SANTE}>Santé</option>
-                  <option value={TaskType.SPORT}>Sport</option>
-                  <option value={TaskType.TRAVAIL}>Travail</option>
-                  <option value={TaskType.LOISIRS}>Loisirs</option>
+                  {Object.values(TaskType).map((type) => (
+                    <option
+                      key={type}
+                      value={type}
+                      className={`${getTaskTypeColor(type).text} ${
+                        getTaskTypeColor(type).bg
+                      }`}
+                    >
+                      {getTaskTypeColor(type).icon} {type}
+                    </option>
+                  ))}
                 </select>
               </div>
 
