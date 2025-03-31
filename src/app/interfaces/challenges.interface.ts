@@ -13,7 +13,6 @@ export interface Challenge {
   createdAt: string;
   updatedAt: string;
   userId: string;
-  completed: boolean;
 }
 
 export interface ChallengeProgress {

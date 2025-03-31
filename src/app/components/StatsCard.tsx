@@ -94,7 +94,9 @@ export default function StatsCard({
       animate={{ opacity: 1, x: 0 }}
       className="bg-white rounded-2xl p-8 shadow-lg relative"
     >
-      <h2 className="text-2xl font-semibold text-sage-800 mb-6">Infos mois en cours</h2>
+      <h2 className="text-2xl font-semibold text-sage-800 mb-6">
+        Infos mois en cours
+      </h2>
       <div className="space-y-6 h-full flex flex-col">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-sage-50 py-3 px-5 rounded-xl text-center sm:text-left h-full">
@@ -129,9 +131,19 @@ export default function StatsCard({
             <span>Challenge du mois</span>
             {currentChallenge && (
               <span
-                className={`px-2 py-1 text-xs font-medium rounded-full bg-blue-400 text-white`}
+                className={`px-2 py-1 text-xs font-medium rounded-full ${
+                  currentChallenge.status === "COMPLETED"
+                    ? "bg-emerald-200 text-emerald-800"
+                    : currentChallenge.status === "FAILED"
+                    ? "bg-red-200 text-red-800"
+                    : "bg-blue-400 text-white"
+                }`}
               >
-                En cours
+                {currentChallenge.status === "COMPLETED"
+                  ? "Réussi"
+                  : currentChallenge.status === "FAILED"
+                  ? "Manqué"
+                  : "En cours"}
               </span>
             )}
           </h3>
@@ -144,13 +156,19 @@ export default function StatsCard({
             <div className="space-y-3">
               <div
                 className={`flex items-center gap-3 p-3 rounded-lg ${
-                  currentChallenge.type &&
-                  challengeTypeInfo[currentChallenge.type].bgColor
+                  currentChallenge.status === "COMPLETED"
+                    ? "bg-emerald-100 text-emerald-800"
+                    : currentChallenge.status === "FAILED"
+                    ? "bg-red-100 text-red-800"
+                    : currentChallenge.type &&
+                      challengeTypeInfo[currentChallenge.type].bgColor
                 } ${
+                  currentChallenge.status === "ACTIVE" &&
                   currentChallenge.type &&
                   challengeTypeInfo[currentChallenge.type].textColor
                 } ${
-                  currentChallenge.type === ChallengeType.PERFECT_MONTH
+                  currentChallenge.type === ChallengeType.PERFECT_MONTH &&
+                  currentChallenge.status === "ACTIVE"
                     ? "bg-gradient-to-br from-amber-50 via-amber-100 to-yellow-100 border border-amber-200 shadow-sm relative overflow-hidden"
                     : ""
                 }`}
@@ -163,12 +181,18 @@ export default function StatsCard({
                 )}
                 <div
                   className={`flex-shrink-0 p-2 rounded-full ${
-                    currentChallenge.type &&
-                    challengeTypeInfo[currentChallenge.type].iconColor
-                  } ${
-                    currentChallenge.type === ChallengeType.PERFECT_MONTH
-                      ? "bg-gradient-to-r from-amber-200 to-yellow-300 shadow-md relative"
-                      : "bg-white/80"
+                    currentChallenge.status === "COMPLETED"
+                      ? "bg-emerald-200 text-emerald-600"
+                      : currentChallenge.status === "FAILED"
+                      ? "bg-red-200 text-red-600"
+                      : currentChallenge.type &&
+                        `${
+                          challengeTypeInfo[currentChallenge.type].iconColor
+                        } ${
+                          currentChallenge.type === ChallengeType.PERFECT_MONTH
+                            ? "bg-gradient-to-r from-amber-200 to-yellow-300 shadow-md relative"
+                            : "bg-white/80"
+                        }`
                   }`}
                 >
                   {currentChallenge.type &&
@@ -201,33 +225,34 @@ export default function StatsCard({
                   )}
                 </div>
                 <div>
-                  <h4
-                    className={`font-medium ${
-                      currentChallenge.type &&
-                      challengeTypeInfo[currentChallenge.type].textColor
-                    } ${
-                      currentChallenge.type === ChallengeType.PERFECT_MONTH
-                        ? "text-amber-800 font-bold"
-                        : ""
-                    }`}
-                  >
-                    {currentChallenge.type &&
-                      challengeTypeInfo[currentChallenge.type].title}
-                  </h4>
-                  {currentChallenge.description && (
-                    <p className="text-sm opacity-80">
-                      {currentChallenge.description}
-                    </p>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <h4
+                      className={`font-medium ${
+                        currentChallenge.status === "COMPLETED"
+                          ? "text-emerald-800"
+                          : currentChallenge.status === "FAILED"
+                          ? "text-red-800"
+                          : currentChallenge.type &&
+                            challengeTypeInfo[currentChallenge.type].textColor
+                      }`}
+                    >
+                      {currentChallenge.type &&
+                        challengeTypeInfo[currentChallenge.type].title}
+                    </h4>
+                  </div>
                 </div>
               </div>
 
-              {/* Barre de progression réelle */}
+              {/* Barre de progression */}
               <div className="w-full bg-gray-200 rounded-full h-2.5 mb-1 overflow-hidden">
                 <div
                   className={`h-2.5 rounded-full transition-all duration-500 ${
-                    currentChallenge.type === ChallengeType.MONTHLY_TASKS
+                    currentChallenge.status === "COMPLETED"
                       ? "bg-emerald-500"
+                      : currentChallenge.status === "FAILED"
+                      ? "bg-red-500"
+                      : currentChallenge.type === ChallengeType.MONTHLY_TASKS
+                      ? "bg-purple-500"
                       : currentChallenge.type === ChallengeType.STREAK_DAYS
                       ? "bg-orange-500"
                       : currentChallenge.type === ChallengeType.PERFECT_MONTH
