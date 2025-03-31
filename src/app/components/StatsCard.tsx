@@ -14,10 +14,9 @@ import { CurrentMonthStats } from "../interfaces/currentMonthStats.interface";
 
 export default function StatsCard({
   onNewChallenge,
-  currentChallenge,
   isLoadingChallenge,
   refreshTrigger = 0,
-}: StatsCardProps) {
+}: Readonly<Omit<StatsCardProps, "currentChallenge">>) {
   const [stats, setStats] = useState<CurrentMonthStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [challengeProgress, setChallengeProgress] =
@@ -44,10 +43,10 @@ export default function StatsCard({
     fetchStats();
   }, [refreshTrigger]);
 
-  // Récupérer la progression du challenge lorsque currentChallenge change ou refreshTrigger change
+  // Récupérer la progression du challenge lorsque stats.challenge change ou refreshTrigger change
   useEffect(() => {
     const fetchChallengeProgress = async () => {
-      if (!currentChallenge) {
+      if (!stats?.challenge) {
         setChallengeProgress(null);
         return;
       }
@@ -70,7 +69,7 @@ export default function StatsCard({
     };
 
     fetchChallengeProgress();
-  }, [currentChallenge, refreshTrigger]);
+  }, [stats?.challenge, refreshTrigger]);
 
   const renderFavoriteTypes = () => {
     if (!stats?.favoriteTypes) return "Aucune tâche ce mois-ci";
@@ -129,19 +128,19 @@ export default function StatsCard({
         <div className="bg-sage-50 py-4 px-5 rounded-xl">
           <h3 className="text-sm text-sage-600 mb-3 flex items-center justify-between">
             <span>Challenge du mois</span>
-            {currentChallenge && (
+            {stats?.challenge && (
               <span
                 className={`px-2 py-1 text-xs font-medium rounded-full ${
-                  currentChallenge.status === "COMPLETED"
+                  stats.challenge.status === "COMPLETED"
                     ? "bg-emerald-200 text-emerald-800"
-                    : currentChallenge.status === "FAILED"
+                    : stats.challenge.status === "FAILED"
                     ? "bg-red-200 text-red-800"
                     : "bg-blue-400 text-white"
                 }`}
               >
-                {currentChallenge.status === "COMPLETED"
+                {stats.challenge.status === "COMPLETED"
                   ? "Réussi"
-                  : currentChallenge.status === "FAILED"
+                  : stats.challenge.status === "FAILED"
                   ? "Manqué"
                   : "En cours"}
               </span>
@@ -152,28 +151,28 @@ export default function StatsCard({
             <div className="flex justify-center py-3">
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-emerald-600"></div>
             </div>
-          ) : currentChallenge ? (
+          ) : stats?.challenge ? (
             <div className="space-y-3">
               <div
                 className={`flex items-center gap-3 p-3 rounded-lg ${
-                  currentChallenge.status === "COMPLETED"
+                  stats.challenge.status === "COMPLETED"
                     ? "bg-emerald-100 text-emerald-800"
-                    : currentChallenge.status === "FAILED"
+                    : stats.challenge.status === "FAILED"
                     ? "bg-red-100 text-red-800"
-                    : currentChallenge.type &&
-                      challengeTypeInfo[currentChallenge.type].bgColor
+                    : stats.challenge.type &&
+                      challengeTypeInfo[stats.challenge.type].bgColor
                 } ${
-                  currentChallenge.status === "ACTIVE" &&
-                  currentChallenge.type &&
-                  challengeTypeInfo[currentChallenge.type].textColor
+                  stats.challenge.status === "ACTIVE" &&
+                  stats.challenge.type &&
+                  challengeTypeInfo[stats.challenge.type].textColor
                 } ${
-                  currentChallenge.type === ChallengeType.PERFECT_MONTH &&
-                  currentChallenge.status === "ACTIVE"
+                  stats.challenge.type === ChallengeType.PERFECT_MONTH &&
+                  stats.challenge.status === "ACTIVE"
                     ? "bg-gradient-to-br from-amber-50 via-amber-100 to-yellow-100 border border-amber-200 shadow-sm relative overflow-hidden"
                     : ""
                 }`}
               >
-                {currentChallenge.type === ChallengeType.PERFECT_MONTH && (
+                {stats.challenge.type === ChallengeType.PERFECT_MONTH && (
                   <>
                     <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_rgba(251,191,36,0.15),transparent_70%)]"></div>
                     <div className="absolute -top-6 -right-6 w-12 h-12 bg-yellow-300 opacity-10 rounded-full blur-xl"></div>
@@ -181,23 +180,21 @@ export default function StatsCard({
                 )}
                 <div
                   className={`flex-shrink-0 p-2 rounded-full ${
-                    currentChallenge.status === "COMPLETED"
+                    stats.challenge.status === "COMPLETED"
                       ? "bg-emerald-200 text-emerald-600"
-                      : currentChallenge.status === "FAILED"
+                      : stats.challenge.status === "FAILED"
                       ? "bg-red-200 text-red-600"
-                      : currentChallenge.type &&
-                        `${
-                          challengeTypeInfo[currentChallenge.type].iconColor
-                        } ${
-                          currentChallenge.type === ChallengeType.PERFECT_MONTH
+                      : stats.challenge.type &&
+                        `${challengeTypeInfo[stats.challenge.type].iconColor} ${
+                          stats.challenge.type === ChallengeType.PERFECT_MONTH
                             ? "bg-gradient-to-r from-amber-200 to-yellow-300 shadow-md relative"
                             : "bg-white/80"
                         }`
                   }`}
                 >
-                  {currentChallenge.type &&
-                    challengeTypeInfo[currentChallenge.type].icon}
-                  {currentChallenge.type === ChallengeType.PERFECT_MONTH && (
+                  {stats.challenge.type &&
+                    challengeTypeInfo[stats.challenge.type].icon}
+                  {stats.challenge.type === ChallengeType.PERFECT_MONTH && (
                     <>
                       {[...Array(5)].map((_, i) => (
                         <motion.div
@@ -228,16 +225,16 @@ export default function StatsCard({
                   <div className="flex items-center gap-2">
                     <h4
                       className={`font-medium ${
-                        currentChallenge.status === "COMPLETED"
+                        stats.challenge.status === "COMPLETED"
                           ? "text-emerald-800"
-                          : currentChallenge.status === "FAILED"
+                          : stats.challenge.status === "FAILED"
                           ? "text-red-800"
-                          : currentChallenge.type &&
-                            challengeTypeInfo[currentChallenge.type].textColor
+                          : stats.challenge.type &&
+                            challengeTypeInfo[stats.challenge.type].textColor
                       }`}
                     >
-                      {currentChallenge.type &&
-                        challengeTypeInfo[currentChallenge.type].title}
+                      {stats.challenge.type &&
+                        challengeTypeInfo[stats.challenge.type].title}
                     </h4>
                   </div>
                 </div>
@@ -247,15 +244,15 @@ export default function StatsCard({
               <div className="w-full bg-gray-200 rounded-full h-2.5 mb-1 overflow-hidden">
                 <div
                   className={`h-2.5 rounded-full transition-all duration-500 ${
-                    currentChallenge.status === "COMPLETED"
+                    stats.challenge.status === "COMPLETED"
                       ? "bg-emerald-500"
-                      : currentChallenge.status === "FAILED"
+                      : stats.challenge.status === "FAILED"
                       ? "bg-red-500"
-                      : currentChallenge.type === ChallengeType.MONTHLY_TASKS
+                      : stats.challenge.type === ChallengeType.MONTHLY_TASKS
                       ? "bg-purple-500"
-                      : currentChallenge.type === ChallengeType.STREAK_DAYS
+                      : stats.challenge.type === ChallengeType.STREAK_DAYS
                       ? "bg-orange-500"
-                      : currentChallenge.type === ChallengeType.PERFECT_MONTH
+                      : stats.challenge.type === ChallengeType.PERFECT_MONTH
                       ? "bg-gradient-to-r from-amber-400 to-yellow-500 relative"
                       : "bg-blue-500"
                   }`}
@@ -265,7 +262,7 @@ export default function StatsCard({
                     }%`,
                   }}
                 >
-                  {currentChallenge.type === ChallengeType.PERFECT_MONTH && (
+                  {stats.challenge.type === ChallengeType.PERFECT_MONTH && (
                     <motion.div
                       className="absolute inset-0 w-full h-full"
                       style={{
@@ -292,14 +289,14 @@ export default function StatsCard({
                   </span>
                 ) : (
                   `Progression: ${challengeProgress?.progress || 0}/${
-                    challengeProgress?.total || currentChallenge.goal
+                    challengeProgress?.total || stats.challenge.goal
                   }`
                 )}
               </p>
 
               <div
                 className={`rounded-lg p-3 space-y-2 ${
-                  currentChallenge.type === ChallengeType.PERFECT_MONTH
+                  stats.challenge.type === ChallengeType.PERFECT_MONTH
                     ? "bg-gradient-to-br from-amber-50 to-yellow-100 border border-amber-200"
                     : "bg-white/50"
                 }`}
@@ -307,18 +304,17 @@ export default function StatsCard({
                 <div className="flex items-center justify-between">
                   <span
                     className={`text-xs flex items-center ${
-                      currentChallenge.type &&
-                      challengeTypeInfo[currentChallenge.type].textColor
+                      stats.challenge.type &&
+                      challengeTypeInfo[stats.challenge.type].textColor
                     }`}
                   >
                     <span
                       className={`inline-block w-1.5 h-1.5 rounded-full mr-1 ${
-                        currentChallenge.type === ChallengeType.MONTHLY_TASKS
+                        stats.challenge.type === ChallengeType.MONTHLY_TASKS
                           ? "bg-emerald-500"
-                          : currentChallenge.type === ChallengeType.STREAK_DAYS
+                          : stats.challenge.type === ChallengeType.STREAK_DAYS
                           ? "bg-orange-500"
-                          : currentChallenge.type ===
-                            ChallengeType.PERFECT_MONTH
+                          : stats.challenge.type === ChallengeType.PERFECT_MONTH
                           ? "bg-amber-500"
                           : "bg-blue-500"
                       }`}
@@ -327,60 +323,60 @@ export default function StatsCard({
                   </span>
                   <span
                     className={`text-sm font-medium ${
-                      currentChallenge.type &&
-                      challengeTypeInfo[currentChallenge.type].textColor
+                      stats.challenge.type &&
+                      challengeTypeInfo[stats.challenge.type].textColor
                     }`}
                   >
-                    {currentChallenge.goal}{" "}
-                    {currentChallenge.type === ChallengeType.MONTHLY_TASKS
+                    {stats.challenge.goal}{" "}
+                    {stats.challenge.type === ChallengeType.MONTHLY_TASKS
                       ? "tâches"
-                      : currentChallenge.type === ChallengeType.STREAK_DAYS
+                      : stats.challenge.type === ChallengeType.STREAK_DAYS
                       ? "jours"
-                      : currentChallenge.type === ChallengeType.PERFECT_MONTH
+                      : stats.challenge.type === ChallengeType.PERFECT_MONTH
                       ? "jours parfaits"
                       : ""}
                   </span>
                 </div>
 
-                {currentChallenge.taskType && (
+                {stats.challenge.taskType && (
                   <div className="flex items-center justify-between">
                     <span
                       className={`text-xs flex items-center ${
-                        currentChallenge.type &&
-                        challengeTypeInfo[currentChallenge.type].textColor
+                        stats.challenge.type &&
+                        challengeTypeInfo[stats.challenge.type].textColor
                       }`}
                     >
                       <span
                         className={`inline-block w-1.5 h-1.5 rounded-full mr-1 ${
-                          currentChallenge.type === ChallengeType.TASK_TYPE_GOAL
+                          stats.challenge.type === ChallengeType.TASK_TYPE_GOAL
                             ? "bg-yellow-500"
-                            : currentChallenge.type &&
-                              challengeTypeInfo[currentChallenge.type].iconColor
+                            : stats.challenge.type &&
+                              challengeTypeInfo[stats.challenge.type].iconColor
                         }`}
                       ></span>
                       Type de tâche
                     </span>
                     <span
                       className={`text-sm font-medium px-2 py-0.5 rounded-full ${
-                        getTaskTypeColor(currentChallenge.taskType).bg
-                      } ${getTaskTypeColor(currentChallenge.taskType).text}`}
+                        getTaskTypeColor(stats.challenge.taskType).bg
+                      } ${getTaskTypeColor(stats.challenge.taskType).text}`}
                     >
-                      {currentChallenge.taskType}
+                      {stats.challenge.taskType}
                     </span>
                   </div>
                 )}
 
-                {currentChallenge.reward && (
+                {stats.challenge.reward && (
                   <div className="flex items-center justify-between">
                     <span
                       className={`text-xs flex items-center ${
-                        currentChallenge.type &&
-                        challengeTypeInfo[currentChallenge.type].textColor
+                        stats.challenge.type &&
+                        challengeTypeInfo[stats.challenge.type].textColor
                       }`}
                     >
                       <span
                         className={`inline-block w-1.5 h-1.5 rounded-full mr-1 ${
-                          currentChallenge.type === ChallengeType.PERFECT_MONTH
+                          stats.challenge.type === ChallengeType.PERFECT_MONTH
                             ? "bg-yellow-500"
                             : "bg-emerald-500"
                         }`}
@@ -389,29 +385,29 @@ export default function StatsCard({
                     </span>
                     <span
                       className={`text-sm font-medium ${
-                        currentChallenge.type === ChallengeType.PERFECT_MONTH
+                        stats.challenge.type === ChallengeType.PERFECT_MONTH
                           ? "text-amber-600"
                           : "text-emerald-600"
                       }`}
                     >
-                      {currentChallenge.reward}
+                      {stats.challenge.reward}
                     </span>
                   </div>
                 )}
 
-                {currentChallenge.penalty && (
+                {stats.challenge.penalty && (
                   <div className="flex items-center justify-between">
                     <span
                       className={`text-xs flex items-center ${
-                        currentChallenge.type &&
-                        challengeTypeInfo[currentChallenge.type].textColor
+                        stats.challenge.type &&
+                        challengeTypeInfo[stats.challenge.type].textColor
                       }`}
                     >
                       <span className="inline-block w-1.5 h-1.5 bg-red-500 rounded-full mr-1"></span>
                       Pénalité
                     </span>
                     <span className="text-sm font-medium text-red-600">
-                      {currentChallenge.penalty}
+                      {stats.challenge.penalty}
                     </span>
                   </div>
                 )}

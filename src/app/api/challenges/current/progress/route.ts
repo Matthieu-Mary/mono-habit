@@ -4,6 +4,16 @@ import { authOptions } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
 import { ChallengeStatus, ChallengeType } from "../../../../types/enums";
 
+async function updateChallengeStatus(
+  challengeId: string,
+  newStatus: ChallengeStatus
+) {
+  await prisma.challenge.update({
+    where: { id: challengeId },
+    data: { status: newStatus },
+  });
+}
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -46,9 +56,18 @@ export async function GET() {
       );
     }
 
-    // Calculer la progression en fonction du type de challenge
+    // Calculer le nombre de jours restants dans le mois
+    const today = new Date();
+    const lastDayOfMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() + 1,
+      0
+    );
+    const remainingDays = lastDayOfMonth.getDate() - today.getDate();
+
     let progress = 0;
     let total = currentChallenge.goal;
+    let shouldFailChallenge = false;
 
     if (currentChallenge.type === ChallengeType.MONTHLY_TASKS) {
       // Compter le nombre de tâches complétées ce mois-ci
@@ -76,6 +95,12 @@ export async function GET() {
       });
 
       progress = completedTasks;
+
+      // Vérifier si c'est mathématiquement possible d'atteindre l'objectif
+      const maxPossibleTasks = progress + remainingDays;
+      if (maxPossibleTasks < currentChallenge.goal) {
+        shouldFailChallenge = true;
+      }
     } else if (currentChallenge.type === ChallengeType.STREAK_DAYS) {
       // Récupérer tous les jours des 30 derniers jours
       const endDate = new Date();
@@ -127,6 +152,12 @@ export async function GET() {
       }
 
       progress = currentStreak;
+
+      // Si le streak actuel + jours restants ne peut pas atteindre l'objectif
+      const maxPossibleStreak = currentStreak + remainingDays;
+      if (maxPossibleStreak < currentChallenge.goal) {
+        shouldFailChallenge = true;
+      }
     } else if (currentChallenge.type === ChallengeType.PERFECT_MONTH) {
       // Compter le nombre de jours avec des tâches complétées ce mois-ci
       const startOfMonth = new Date();
@@ -152,6 +183,22 @@ export async function GET() {
 
       // Le total est le nombre de jours écoulés dans le mois
       total = today.getDate();
+
+      // Vérifier s'il y a des jours manqués dans le mois
+      const missedDays = await prisma.habitLog.findFirst({
+        where: {
+          userId: user.id,
+          date: {
+            gte: startOfMonth,
+            lte: today,
+          },
+          completed: false,
+        },
+      });
+
+      if (missedDays) {
+        shouldFailChallenge = true;
+      }
     } else if (currentChallenge.type === ChallengeType.TASK_TYPE_GOAL) {
       // Compter le nombre de tâches d'un type spécifique complétées ce mois-ci
       const startOfMonth = new Date();
@@ -178,19 +225,35 @@ export async function GET() {
       });
 
       progress = completedTasks;
+
+      // Vérifier si c'est mathématiquement possible d'atteindre l'objectif
+      const maxPossibleTasks = progress + remainingDays;
+      if (maxPossibleTasks < currentChallenge.goal) {
+        shouldFailChallenge = true;
+      }
+    }
+
+    // Mettre à jour le statut si nécessaire
+    if (shouldFailChallenge) {
+      await updateChallengeStatus(currentChallenge.id, ChallengeStatus.FAILED);
+    } else if (progress >= currentChallenge.goal) {
+      await updateChallengeStatus(
+        currentChallenge.id,
+        ChallengeStatus.COMPLETED
+      );
     }
 
     // Calculer le pourcentage de progression
     const percentage = Math.min(Math.round((progress / total) * 100), 100);
 
     return NextResponse.json({
-      challenge: currentChallenge,
       progress,
       total,
       percentage,
+      remainingDays,
     });
   } catch (error) {
-    console.error("Erreur lors de la récupération de la progression:", error);
+    console.error("Erreur lors du calcul de la progression:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
