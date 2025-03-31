@@ -25,7 +25,6 @@ export async function GET() {
       );
     }
 
-    // Récupérer l'utilisateur
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
     });
@@ -37,15 +36,11 @@ export async function GET() {
       );
     }
 
-    // Obtenir le mois actuel (1-12)
     const currentMonth = new Date().getMonth() + 1;
-
-    // Récupérer le challenge du mois en cours
     const currentChallenge = await prisma.challenge.findFirst({
       where: {
         userId: user.id,
         month: currentMonth,
-        status: ChallengeStatus.ACTIVE,
       },
     });
 
@@ -69,18 +64,15 @@ export async function GET() {
     let total = currentChallenge.goal;
     let shouldFailChallenge = false;
 
+    // Définir la période du mois
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    startOfMonth.setHours(0, 0, 0, 0);
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    endOfMonth.setHours(23, 59, 59, 999);
+
     if (currentChallenge.type === ChallengeType.MONTHLY_TASKS) {
-      // Compter le nombre de tâches complétées ce mois-ci
-      const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      startOfMonth.setHours(0, 0, 0, 0);
-
-      const endOfMonth = new Date();
-      endOfMonth.setMonth(endOfMonth.getMonth() + 1);
-      endOfMonth.setDate(0);
-      endOfMonth.setHours(23, 59, 59, 999);
-
-      const completedTasks = await prisma.habitLog.count({
+      // Compter toutes les tâches complétées ce mois-ci
+      progress = await prisma.habitLog.count({
         where: {
           userId: user.id,
           completed: true,
@@ -88,13 +80,8 @@ export async function GET() {
             gte: startOfMonth,
             lte: endOfMonth,
           },
-          ...(currentChallenge.taskType
-            ? { habit: { type: currentChallenge.taskType } }
-            : {}),
         },
       });
-
-      progress = completedTasks;
 
       // Vérifier si c'est mathématiquement possible d'atteindre l'objectif
       const maxPossibleTasks = progress + remainingDays;
@@ -102,71 +89,57 @@ export async function GET() {
         shouldFailChallenge = true;
       }
     } else if (currentChallenge.type === ChallengeType.STREAK_DAYS) {
-      // Récupérer tous les jours des 30 derniers jours
-      const endDate = new Date();
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - 30); // Regarder les 30 derniers jours
-
-      // Récupérer les logs pour chaque jour
-      const habitLogs = await prisma.habitLog.findMany({
+      // Récupérer tous les logs du mois triés par date
+      const logs = await prisma.habitLog.findMany({
         where: {
           userId: user.id,
           date: {
-            gte: startDate,
-            lte: endDate,
+            gte: startOfMonth,
+            lte: today,
           },
         },
         orderBy: {
-          date: "desc",
+          date: "asc",
         },
-      });
-
-      // Regrouper par jour et vérifier si chaque jour a au moins une tâche complétée
-      const dailyCompletions = new Map();
-      habitLogs.forEach((log) => {
-        const dateStr = new Date(log.date).toISOString().split("T")[0];
-        if (!dailyCompletions.has(dateStr)) {
-          dailyCompletions.set(dateStr, false);
-        }
-        if (log.completed) {
-          dailyCompletions.set(dateStr, true);
-        }
       });
 
       // Calculer le streak actuel
       let currentStreak = 0;
+      let maxStreak = 0;
+      let previousDate: Date | null = null;
 
-      // Vérifier chaque jour en partant d'aujourd'hui
-      for (let i = 0; i < 30; i++) {
-        const checkDate = new Date();
-        checkDate.setDate(checkDate.getDate() - i);
-        const dateStr = checkDate.toISOString().split("T")[0];
-
-        // Si le jour a au moins une tâche complétée, incrémenter le streak
-        if (dailyCompletions.get(dateStr)) {
-          currentStreak++;
+      for (const log of logs) {
+        if (log.completed) {
+          if (!previousDate) {
+            currentStreak = 1;
+          } else {
+            const diffDays = Math.floor(
+              (log.date.getTime() - previousDate.getTime()) /
+                (1000 * 60 * 60 * 24)
+            );
+            if (diffDays === 1) {
+              currentStreak++;
+            } else {
+              currentStreak = 1;
+            }
+          }
+          previousDate = log.date;
+          maxStreak = Math.max(maxStreak, currentStreak);
         } else {
-          // Si un jour n'a pas de tâche complétée, arrêter le comptage
-          break;
+          currentStreak = 0;
+          previousDate = null;
         }
       }
 
-      progress = currentStreak;
+      progress = maxStreak;
 
-      // Si le streak actuel + jours restants ne peut pas atteindre l'objectif
+      // Vérifier si c'est mathématiquement possible d'atteindre l'objectif
       const maxPossibleStreak = currentStreak + remainingDays;
       if (maxPossibleStreak < currentChallenge.goal) {
         shouldFailChallenge = true;
       }
     } else if (currentChallenge.type === ChallengeType.PERFECT_MONTH) {
-      // Compter le nombre de jours avec des tâches complétées ce mois-ci
-      const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      startOfMonth.setHours(0, 0, 0, 0);
-
-      const today = new Date();
-      today.setHours(23, 59, 59, 999);
-
+      // Compter le nombre de jours avec des tâches complétées
       const daysWithCompletedTasks = await prisma.$queryRaw`
         SELECT COUNT(DISTINCT date::date) as days_count
         FROM "HabitLog"
@@ -176,15 +149,12 @@ export async function GET() {
           AND date <= ${today}
       `;
 
-      // Ajouter un type explicite pour résoudre l'erreur
       type DaysCountResult = { days_count: number }[];
       progress =
         (daysWithCompletedTasks as DaysCountResult)[0]?.days_count || 0;
+      total = lastDayOfMonth.getDate();
 
-      // Le total est le nombre de jours écoulés dans le mois
-      total = today.getDate();
-
-      // Vérifier s'il y a des jours manqués dans le mois
+      // Vérifier s'il y a des jours manqués
       const missedDays = await prisma.habitLog.findFirst({
         where: {
           userId: user.id,
@@ -200,17 +170,8 @@ export async function GET() {
         shouldFailChallenge = true;
       }
     } else if (currentChallenge.type === ChallengeType.TASK_TYPE_GOAL) {
-      // Compter le nombre de tâches d'un type spécifique complétées ce mois-ci
-      const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      startOfMonth.setHours(0, 0, 0, 0);
-
-      const endOfMonth = new Date();
-      endOfMonth.setMonth(endOfMonth.getMonth() + 1);
-      endOfMonth.setDate(0);
-      endOfMonth.setHours(23, 59, 59, 999);
-
-      const completedTasks = await prisma.habitLog.count({
+      // Compter les tâches d'un type spécifique
+      progress = await prisma.habitLog.count({
         where: {
           userId: user.id,
           completed: true,
@@ -224,9 +185,6 @@ export async function GET() {
         },
       });
 
-      progress = completedTasks;
-
-      // Vérifier si c'est mathématiquement possible d'atteindre l'objectif
       const maxPossibleTasks = progress + remainingDays;
       if (maxPossibleTasks < currentChallenge.goal) {
         shouldFailChallenge = true;
@@ -234,9 +192,15 @@ export async function GET() {
     }
 
     // Mettre à jour le statut si nécessaire
-    if (shouldFailChallenge) {
+    if (
+      shouldFailChallenge &&
+      currentChallenge.status === ChallengeStatus.ACTIVE
+    ) {
       await updateChallengeStatus(currentChallenge.id, ChallengeStatus.FAILED);
-    } else if (progress >= currentChallenge.goal) {
+    } else if (
+      progress >= total &&
+      currentChallenge.status === ChallengeStatus.ACTIVE
+    ) {
       await updateChallengeStatus(
         currentChallenge.id,
         ChallengeStatus.COMPLETED
@@ -254,6 +218,9 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Erreur lors du calcul de la progression:", error);
-    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Erreur lors du calcul de la progression" },
+      { status: 500 }
+    );
   }
 }
