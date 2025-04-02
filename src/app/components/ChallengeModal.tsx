@@ -80,7 +80,7 @@ export default function ChallengeModal({
       resetForm();
       onClose();
 
-      // Appeler la fonction de rappel si elle existe
+      // Appeler onSuccess pour déclencher le refresh
       if (onSuccess) {
         onSuccess();
       }

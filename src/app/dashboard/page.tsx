@@ -242,8 +242,14 @@ export default function DashboardPage() {
   }, [fetchCurrentChallenge]);
 
   const handleChallengeSuccess = useCallback(async () => {
+    // Mettre à jour le challenge
     await fetchCurrentChallenge();
-  }, [fetchCurrentChallenge]);
+    // Forcer le rafraîchissement des stats
+    setRefreshTrigger((prev) => prev + 1);
+    // Mettre à jour les autres données qui pourraient être affectées
+    await fetchStats();
+    await fetchMonthlyHabits();
+  }, [fetchCurrentChallenge, fetchStats, fetchMonthlyHabits]);
 
   if (status === "loading") {
     return (
@@ -388,7 +394,6 @@ export default function DashboardPage() {
           {/* Remplacer le bloc infos par le nouveau composant */}
           <StatsCard
             onNewChallenge={() => setIsChallengeModalOpen(true)}
-            currentChallenge={currentChallenge}
             isLoadingChallenge={isLoadingChallenge}
             refreshTrigger={refreshTrigger}
           />
