@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Header from "src/app/components/Header";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 export default function Register() {
   const router = useRouter();
@@ -11,6 +12,7 @@ export default function Register() {
     email: "",
     password: "",
     confirmPassword: "",
+    acceptedTerms: false,
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -96,6 +98,11 @@ export default function Register() {
 
     if (formData.password !== formData.confirmPassword) {
       setError("Les mots de passe ne correspondent pas.");
+      return;
+    }
+
+    if (!formData.acceptedTerms) {
+      setError("Vous devez accepter les conditions générales d'utilisation.");
       return;
     }
 
@@ -275,9 +282,42 @@ export default function Register() {
             )}
           </div>
 
+          <div className="flex items-start mt-4">
+            <div className="flex items-center h-5">
+              <input
+                id="acceptedTerms"
+                type="checkbox"
+                checked={formData.acceptedTerms}
+                onChange={(e) =>
+                  setFormData({ ...formData, acceptedTerms: e.target.checked })
+                }
+                className="w-4 h-4 border border-sage-300 rounded bg-sage-50 focus:ring-3 focus:ring-emerald-300 text-emerald-600"
+                required
+              />
+            </div>
+            <label
+              htmlFor="acceptedTerms"
+              className="ml-2 text-sm font-medium text-sage-700"
+            >
+              J&apos;ai lu et j&apos;accepte les{" "}
+              <Link
+                href="/cgu"
+                className="text-emerald-600 hover:text-emerald-700 underline"
+                target="_blank"
+              >
+                conditions générales d&apos;utilisation
+              </Link>
+            </label>
+          </div>
+
           <button
             type="submit"
-            disabled={isLoading || !passwordMatch || passwordStrength.score < 3}
+            disabled={
+              isLoading ||
+              !passwordMatch ||
+              passwordStrength.score < 3 ||
+              !formData.acceptedTerms
+            }
             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-8 rounded-full transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
