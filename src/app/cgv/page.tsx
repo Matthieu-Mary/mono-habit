@@ -10,28 +10,27 @@ export default function CGVPage() {
           <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
           <p>
             Les présentes conditions générales de vente s&apos;appliquent à tous
-            les services proposés par Mono Habit sur son application mobile.
+            les services proposés par MonoHabit sur son application mobile.
           </p>
         </section>
 
         <section>
           <h2 className="text-2xl font-semibold mb-4">2. Définitions</h2>
           <p>
-            &quot;Application&quot; : désigne l&apos;application mobile Mono
-            Habit
+            &quot;Application&quot; : désigne l&apos;application mobile MonoHabit
             <br />
             &quot;Utilisateur&quot; : désigne toute personne utilisant
             l&apos;Application
             <br />
             &quot;Services&quot; : désigne l&apos;ensemble des services proposés
-            par Mono Habit
+            par MonoHabit
           </p>
         </section>
 
         <section>
           <h2 className="text-2xl font-semibold mb-4">3. Services proposés</h2>
           <p>
-            Mono Habit propose une application mobile permettant aux
+            MonoHabit propose une application mobile permettant aux
             utilisateurs de gérer leurs habitudes et routines quotidiennes.
           </p>
         </section>
@@ -63,7 +62,7 @@ export default function CGVPage() {
         <section>
           <h2 className="text-2xl font-semibold mb-4">6. Garanties</h2>
           <p>
-            Mono Habit s&apos;engage à fournir un service conforme aux
+            MonoHabit s&apos;engage à fournir un service conforme aux
             descriptions présentées dans l&apos;Application. L&apos;Application
             est fournie &quot;telle quelle&quot; sans garantie d&apos;aucune
             sorte.
@@ -73,7 +72,7 @@ export default function CGVPage() {
         <section>
           <h2 className="text-2xl font-semibold mb-4">7. Responsabilité</h2>
           <p>
-            Mono Habit ne pourra être tenu responsable des dommages directs ou
+            MonoHabit ne pourra être tenu responsable des dommages directs ou
             indirects causés à l&apos;utilisateur ou à des tiers, résultant de
             l&apos;utilisation ou de l&apos;impossibilité d&apos;utiliser
             l&apos;Application.
@@ -102,7 +101,7 @@ export default function CGVPage() {
         <section>
           <h2 className="text-2xl font-semibold mb-4">10. Modifications</h2>
           <p>
-            Mono Habit se réserve le droit de modifier à tout moment les
+            MonoHabit se réserve le droit de modifier à tout moment les
             présentes conditions générales de vente. Les modifications entrent
             en vigueur dès leur publication dans l&apos;Application.
           </p>

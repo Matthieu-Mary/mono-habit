@@ -13,7 +13,7 @@ export default function CGUPage() {
             1. Acceptation des conditions
           </h2>
           <p>
-            En accédant et en utilisant l&apos;application Mono Habit, vous
+            En accédant et en utilisant l&apos;application MonoHabit, vous
             acceptez d&apos;être lié par ces conditions générales
             d&apos;utilisation. Si vous n&apos;acceptez pas ces conditions,
             veuillez ne pas utiliser l&apos;application.
@@ -25,7 +25,7 @@ export default function CGUPage() {
             2. Description du service
           </h2>
           <p>
-            Mono Habit est une application mobile permettant aux utilisateurs de
+            MonoHabit est une application mobile permettant aux utilisateurs de
             gérer leurs habitudes et routines quotidiennes. L&apos;application
             propose des fonctionnalités de suivi, de planification et
             d&apos;analyse des habitudes.
@@ -93,7 +93,7 @@ export default function CGUPage() {
             7. Limitation de responsabilité
           </h2>
           <p>
-            Mono Habit ne pourra être tenu responsable des dommages directs ou
+            MonoHabit ne pourra être tenu responsable des dommages directs ou
             indirects résultant de l&apos;utilisation ou de l&apos;impossibilité
             d&apos;utiliser l&apos;application.
           </p>
@@ -104,7 +104,7 @@ export default function CGUPage() {
             8. Modification des conditions
           </h2>
           <p>
-            Mono Habit se réserve le droit de modifier ces conditions à tout
+            MonoHabit se réserve le droit de modifier ces conditions à tout
             moment. Les modifications entrent en vigueur dès leur publication
             dans l&apos;application.
           </p>
@@ -113,7 +113,7 @@ export default function CGUPage() {
         <section>
           <h2 className="text-2xl font-semibold mb-4">9. Résiliation</h2>
           <p>
-            Mono Habit se réserve le droit de résilier ou de suspendre votre
+            MonoHabit se réserve le droit de résilier ou de suspendre votre
             accès à l&apos;application en cas de violation des présentes
             conditions d&apos;utilisation.
           </p>
