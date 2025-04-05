@@ -5,7 +5,6 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Header from "./components/Header";
 import { usePersistentAuth } from './hooks/usePersistentAuth';
-import Loader from "./components/Loader";
 
 export default function Home() {
   const router = useRouter();
