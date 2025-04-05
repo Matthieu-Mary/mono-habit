@@ -20,5 +20,7 @@ export const config = {
     // Routes qui nécessitent une authentification
     "/dashboard/:path*",
     "/habits/:path*",
+    "/historic/:path*",
+    "/challenge/:path*",
   ],
 };
