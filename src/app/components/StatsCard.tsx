@@ -118,7 +118,7 @@ export default function StatsCard({
 
           <div className="bg-sage-50 py-3 px-5 rounded-xl col-span-1 md:col-span-2 text-center h-full">
             <h3 className="text-sm text-sage-600 mb-2">Type de tâche favori</h3>
-            <div className="flex flex-wrap gap-2 justify-center">
+            <div className="flex flex-wrap gap-2 text-sage-800 justify-center">
               {isLoading ? "-" : renderFavoriteTypes()}
             </div>
           </div>

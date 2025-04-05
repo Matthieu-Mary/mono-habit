@@ -309,9 +309,8 @@ export default function Home() {
                 Défis motivants
               </h3>
               <p className="text-sage-700">
-                Relevez des défis quotidiens et hebdomadaires qui vous poussent
-                à maintenir votre habitude. Dépassez-vous et célébrez chaque
-                victoire.
+                Relevez des défis mensuels qui vous poussent à maintenir votre habitude. 
+                Dépassez-vous et célébrez chaque victoire.
               </p>
             </div>
 
