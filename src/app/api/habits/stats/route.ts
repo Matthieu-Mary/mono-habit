@@ -4,15 +4,7 @@ import { NextResponse } from "next/server";
 import { authOptions } from "../../../lib/auth";
 import { TaskType } from "../../../types/enums";
 import { Challenge } from "../../../interfaces/challenges.interface";
-
-interface MonthlyStats {
-  month: string;
-  successRate: number;
-  currentStreak: number;
-  bestStreak: number;
-  favoriteTypes: TaskType[] | null;
-  challenge: Challenge | null;
-}
+import { CurrentMonthStats } from "src/app/interfaces/currentMonthStats.interface";
 
 export async function GET() {
   try {
@@ -59,7 +51,7 @@ export async function GET() {
       habitsByMonth.get(monthKey)!.push(habit);
     });
 
-    const monthlyStats: MonthlyStats[] = [];
+    const monthlyStats: CurrentMonthStats[] = [];
     const now = new Date();
     const currentMonthKey = `${now.getFullYear()}-${String(
       now.getMonth() + 1
@@ -73,7 +65,7 @@ export async function GET() {
       },
     })) as Challenge | null;
 
-    let currentMonthStats: MonthlyStats | null = null;
+    let currentMonthStats: CurrentMonthStats | null = null;
 
     habitsByMonth.forEach((monthHabits, monthKey) => {
       const [year, month] = monthKey.split("-").map(Number);
@@ -209,7 +201,7 @@ export async function GET() {
         }
       });
 
-      const monthStats: MonthlyStats = {
+      const monthStats: CurrentMonthStats = {
         month: monthKey,
         successRate,
         currentStreak,
@@ -237,7 +229,7 @@ export async function GET() {
           bestStreak: 0,
           favoriteTypes: null,
           challenge: currentChallenge,
-        } as MonthlyStats),
+        } as CurrentMonthStats),
       monthlyStats,
     });
   } catch (error) {

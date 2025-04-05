@@ -103,7 +103,7 @@ export default function StatsCard({
             <p className="text-2xl font-bold text-emerald-600">
               {isLoading ? "-" : `${stats?.successRate}%`}
             </p>
-            <p className="text-xs text-sage-500">Ce mois-ci</p>
+            <p className="text-xs text-sage-500">Depuis le début du mois</p>
           </div>
 
           <div className="bg-sage-50 py-3 px-5 rounded-xl text-center sm:text-left h-full">

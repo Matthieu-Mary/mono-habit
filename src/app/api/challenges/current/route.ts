@@ -28,7 +28,7 @@ export async function GET() {
     }
 
     // Obtenir le mois actuel (1-12)
-    const currentMonth = new Date().getMonth() + 1;
+    const currentMonth: number = new Date().getMonth() + 1;
 
     // Récupérer le challenge du mois en cours
     const currentChallenge = await prisma.challenge.findFirst({

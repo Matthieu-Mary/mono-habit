@@ -36,7 +36,7 @@ export async function GET() {
       );
     }
 
-    const currentMonth = new Date().getMonth() + 1;
+    const currentMonth: number = new Date().getMonth() + 1;
     const currentChallenge = await prisma.challenge.findFirst({
       where: {
         userId: user.id,
