@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Header from "./components/Header";
 import { usePersistentAuth } from './hooks/usePersistentAuth';
+import Loader from "./components/Loader";
 
 export default function Home() {
   const router = useRouter();
@@ -20,9 +21,10 @@ export default function Home() {
   const featuresRef = useRef(null);
 
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isPageReady, setIsPageReady] = useState(false);
 
   // Utiliser notre hook personnalisé
-  const { isAuthLoading } = usePersistentAuth();
+  const { isAuthLoading, shouldRedirect } = usePersistentAuth();
 
   useLayoutEffect(() => {
     // Enregistrement de ScrollTrigger
@@ -33,7 +35,15 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!isLoaded || isAuthLoading) return;
+    // Ne rendre la page visible que si l'authentification a été vérifiée
+    // et qu'aucune redirection n'est nécessaire
+    if (!isAuthLoading && !shouldRedirect) {
+      setIsPageReady(true);
+    }
+  }, [isAuthLoading, shouldRedirect]);
+
+  useEffect(() => {
+    if (!isLoaded || !isPageReady) return;
 
     // Animation d'entrée principale
     const ctx = gsap.context(() => {
@@ -169,12 +179,25 @@ export default function Home() {
     }, mainRef);
 
     return () => ctx.revert(); // Nettoyage des animations
-  }, [isLoaded, isAuthLoading]);
+  }, [isLoaded, isPageReady]);
 
   const handleStartJourney = () => {
     router.push("/auth/login");
   };
 
+  // Afficher un loader pendant la vérification d'authentification
+  if (isAuthLoading || !isPageReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-sage-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+          <p className="text-sage-600">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Afficher le contenu normal une fois prêt
   return (
     <main
       ref={mainRef}
