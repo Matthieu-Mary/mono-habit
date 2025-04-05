@@ -4,6 +4,7 @@ import { useLayoutEffect, useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Header from "./components/Header";
+import { usePersistentAuth } from './hooks/usePersistentAuth';
 
 export default function Home() {
   const router = useRouter();
@@ -20,6 +21,9 @@ export default function Home() {
 
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Utiliser notre hook personnalisé
+  const { isAuthLoading } = usePersistentAuth();
+
   useLayoutEffect(() => {
     // Enregistrement de ScrollTrigger
     gsap.registerPlugin(ScrollTrigger);
@@ -29,7 +33,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!isLoaded || isAuthLoading) return;
 
     // Animation d'entrée principale
     const ctx = gsap.context(() => {
@@ -165,7 +169,7 @@ export default function Home() {
     }, mainRef);
 
     return () => ctx.revert(); // Nettoyage des animations
-  }, [isLoaded]);
+  }, [isLoaded, isAuthLoading]);
 
   const handleStartJourney = () => {
     router.push("/auth/login");

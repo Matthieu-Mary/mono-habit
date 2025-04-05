@@ -12,6 +12,15 @@ export default function Sidebar() {
 
   const isActive = (path: string) => pathname === path;
 
+  const handleSignOut = () => {
+    // Supprimer les tokens du localStorage
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("tokenExpiry");
+    
+    // Déconnexion via NextAuth
+    signOut({ callbackUrl: "/auth/login" });
+  };
+
   return (
     <>
       {/* Bouton pour ouvrir/fermer le sidebar */}
@@ -138,7 +147,7 @@ export default function Sidebar() {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => signOut({ callbackUrl: "/auth/login" })}
+            onClick={handleSignOut}
             className="w-full p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors flex items-center justify-center space-x-2"
           >
             <svg

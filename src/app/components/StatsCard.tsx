@@ -27,7 +27,16 @@ export default function StatsCard({
     const fetchStats = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("/api/habits/stats");
+        
+        // Vérifier si nous avons un token dans localStorage
+        const storedToken = localStorage.getItem("authToken");
+        
+        const headers: HeadersInit = {};
+        if (storedToken) {
+          headers['Authorization'] = `Bearer ${storedToken}`;
+        }
+        
+        const response = await fetch("/api/habits/stats", { headers });
         if (!response.ok)
           throw new Error("Erreur lors du chargement des stats");
 

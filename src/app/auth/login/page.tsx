@@ -29,6 +29,11 @@ export default function Login() {
     });
 
     if (res?.ok) {
+      const token = res.url?.split("token=")[1]?.split("&")[0];
+      if (token) {
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("tokenExpiry", (Date.now() + 24 * 60 * 60 * 1000).toString());
+      }
       router.push("/dashboard");
     } else if (res?.status === 401) {
       setError("Non autorisé");
