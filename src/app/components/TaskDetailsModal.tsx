@@ -28,6 +28,7 @@ export default function TaskDetailsModal({
     title: task?.title ?? "",
     description: task?.description ?? "",
     type: task?.type ?? TaskType.LOISIRS,
+    recurrence: "none",
   });
   const [titleError, setTitleError] = useState<string | null>(null);
 
@@ -39,6 +40,7 @@ export default function TaskDetailsModal({
       title: task?.title ?? "",
       description: task?.description ?? "",
       type: task?.type ?? TaskType.LOISIRS,
+      recurrence: "none",
     });
     setTitleError(null);
   }, [task]);
@@ -81,6 +83,7 @@ export default function TaskDetailsModal({
         body: JSON.stringify({
           ...formData,
           date: task?.date,
+          recurrence: formData.recurrence,
         }),
       });
 
@@ -225,6 +228,32 @@ export default function TaskDetailsModal({
                   </select>
                 </div>
 
+                {/* Nouveau champ pour la récurrence */}
+                {!isEditing && (
+                  <div>
+                    <label className="block text-sage-700 mb-2" htmlFor="recurrence">
+                      Récurrence
+                    </label>
+                    <select
+                      id="recurrence"
+                      value={formData.recurrence}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          recurrence: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-3 rounded-xl border border-sage-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
+                    >
+                      <option value="none">Jour sélectionné</option>
+                      <option value="week">Semaine en cours</option>
+                      <option value="month">Jours restants du mois</option>
+                      <option value="weekdays">Jours ouvrables du mois (Lun-Ven)</option>
+                      <option value="weekends">Weekends du mois (Sam-Dim)</option>
+                    </select>
+                  </div>
+                )}
+
                 <div className="flex gap-4 pt-4">
                   <motion.button
                     whileHover={{ scale: isFormValid ? 1.02 : 1 }}
@@ -257,6 +286,7 @@ export default function TaskDetailsModal({
                           title: task?.title ?? "",
                           description: task?.description ?? "",
                           type: task?.type ?? TaskType.LOISIRS,
+                          recurrence: "none",
                         });
                         setTitleError(null);
                       } else {

@@ -20,6 +20,7 @@ export default function TaskModal({
     title: "",
     description: "",
     type: TaskType.LOISIRS,
+    recurrence: "none",
   });
 
   // eslint-disable-next-line
@@ -55,12 +56,15 @@ export default function TaskModal({
       const response = await fetch("/api/habits", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          recurrence: formData.recurrence,
+        }),
       });
 
       if (!response.ok) throw new Error("Erreur lors de la création");
 
-      setFormData({ title: "", description: "", type: TaskType.LOISIRS });
+      setFormData({ title: "", description: "", type: TaskType.LOISIRS, recurrence: "none" });
       onSuccess();
       onClose();
     } catch (error) {
@@ -161,6 +165,29 @@ export default function TaskModal({
                       {getTaskTypeColor(type).icon} {type}
                     </option>
                   ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sage-700 mb-2" htmlFor="recurrence">
+                  Récurrence
+                </label>
+                <select
+                  id="recurrence"
+                  value={formData.recurrence}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      recurrence: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-3 rounded-xl border border-sage-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
+                >
+                  <option value="none">Jour sélectionné</option>
+                  <option value="week">Semaine en cours</option>
+                  <option value="month">Jours restants du mois</option>
+                  <option value="weekdays">Jours ouvrables du mois (Lun-Ven)</option>
+                  <option value="weekends">Weekends du mois (Sam-Dim)</option>
                 </select>
               </div>
 
