@@ -40,6 +40,7 @@ export default function MonthlyProgress({
 }: Readonly<MonthlyProgressProps>) {
   const [selectedTask, setSelectedTask] = useState<TaskDetails | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Convertit le mois renvoyé par l'API (1..12) en index JS (0..11)
   const serverMonthIndex = month - 1;
@@ -193,11 +194,76 @@ export default function MonthlyProgress({
     handleModalClose();
   };
 
+  // Fonction pour supprimer toutes les tâches programmées du mois
+  const handleDeletePendingTasks = async () => {
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer toutes les tâches programmées pour ce mois ?")) {
+      try {
+        setIsDeleting(true);
+        
+        const response = await fetch(`/api/habits/month/${year}/${month}/pending`, {
+          method: "DELETE",
+        });
+        
+        if (!response.ok) {
+          throw new Error("Erreur lors de la suppression des tâches");
+        }
+        
+        if (onSuccess) {
+          await onSuccess();
+        }
+      } catch (error) {
+        console.error("Erreur:", error);
+        alert("Une erreur est survenue lors de la suppression des tâches");
+      } finally {
+        setIsDeleting(false);
+      }
+    }
+  };
+
+  // Vérifier s'il y a des tâches programmées (PENDING) dans le mois
+  const hasPendingTasks = useMemo(() => {
+    const now = new Date();
+    return habits.some(habit => 
+      habit.status === Status.PENDING && 
+      (new Date(habit.date) >= now)
+    );
+  }, [habits]);
+
   return (
     <div className="bg-white rounded-2xl p-6 shadow-lg">
-      <h2 className="text-2xl font-semibold text-sage-800 mb-4 capitalize">
-        {currentMonthName} {year}
-      </h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-semibold text-sage-800 capitalize">
+          {currentMonthName} {year}
+        </h2>
+        
+        {/* Bouton de suppression des tâches programmées */}
+        {hasPendingTasks && (
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleDeletePendingTasks}
+            disabled={isDeleting}
+            className={`px-3 py-1.5 text-sm rounded-lg transition-colors
+              ${isDeleting 
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                : "bg-red-100 text-red-600 hover:bg-red-200"
+              }
+            `}
+          >
+            {isDeleting ? (
+              <div className="flex items-center">
+                <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin mr-2"></div>
+                Suppression...
+              </div>
+            ) : (
+              <>
+                <span className="hidden sm:inline">Supprimer les tâches programmées</span>
+                <span className="sm:hidden">Supprimer</span>
+              </>
+            )}
+          </motion.button>
+        )}
+      </div>
 
       <div className="grid grid-cols-7 gap-1">
         {/* En-têtes L, M, M, J, V, S, D */}
