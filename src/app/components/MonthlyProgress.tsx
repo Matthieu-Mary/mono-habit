@@ -128,7 +128,10 @@ export default function MonthlyProgress({
   if (daysArray.length > 0) {
     const firstDay = daysArray[0].date;
     // getDay() renvoie : 0(dim), 1(lun), 2(mar)...
-    offset = (firstDay.getDay() + 6) % 7;
+    // Pour un calendrier commençant le lundi, on calcule:
+    offset = firstDay.getDay();
+    if (offset === 0) offset = 7; // Dimanche devient le 7ème jour
+    offset = offset - 1; // Lundi = 0, Mardi = 1, etc.
   }
 
   /**
