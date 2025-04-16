@@ -3,9 +3,9 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Loader from "../components/Loader";
-import { TaskType, ChallengeType } from "../types/enums";
-import { getTaskTypeColor } from "../utils/taskTypeUtils";
-import { challengeTypeInfo } from "../utils/challengeTypeUtils";
+import { TaskType, ChallengeType } from "../../types/enums";
+import { getTaskTypeColor } from "../../utils/taskTypeUtils";
+import { challengeTypeInfo } from "../../utils/challengeTypeUtils";
 
 interface MonthStats {
   month: number;

@@ -52,19 +52,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-  params,
 }: Readonly<{
   children: React.ReactNode;
-  params?: { locale: string };
 }>) {
-  const locale = params?.locale;
-
   return (
-    <html lang={locale || "en"}>
+    <html lang="fr">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers locale={locale}>{children}</Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

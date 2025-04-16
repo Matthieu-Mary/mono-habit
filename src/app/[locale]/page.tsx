@@ -4,7 +4,7 @@ import { useLayoutEffect, useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Header from "./components/Header";
-import { usePersistentAuth } from './hooks/usePersistentAuth';
+import { usePersistentAuth } from '../hooks/usePersistentAuth';
 
 export default function Home() {
   const router = useRouter();

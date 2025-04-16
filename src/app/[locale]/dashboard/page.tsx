@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../../hooks/useAuth";
 import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import TaskModal from "../components/TaskModal";
@@ -8,10 +8,10 @@ import TaskCard from "../components/TaskCard";
 import Loader from "../components/Loader";
 import Celebration from "../components/Celebration";
 import MonthlyProgress from "../components/MonthlyProgress";
-import { MonthlyResponseData } from "../interfaces/monthData.interface";
+import { MonthlyResponseData } from "../../interfaces/monthData.interface";
 import StatsCard from "../components/StatsCard";
 import ChallengeModal from "../components/ChallengeModal";
-import { Challenge } from "../interfaces/challenges.interface";
+import { Challenge } from "../../interfaces/challenges.interface";
 
 function calculateTimeRemaining(): string {
   const now = new Date();
