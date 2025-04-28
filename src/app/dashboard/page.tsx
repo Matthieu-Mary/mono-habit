@@ -396,6 +396,7 @@ export default function DashboardPage() {
             onNewChallenge={() => setIsChallengeModalOpen(true)}
             isLoadingChallenge={isLoadingChallenge}
             refreshTrigger={refreshTrigger}
+            currentChallenge={currentChallenge}
           />
         </div>
 
